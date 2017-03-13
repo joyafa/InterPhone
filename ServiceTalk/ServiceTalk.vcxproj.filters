@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f484c51c-1416-4df4-97e7-fc68ec3700b9}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{123e1493-2917-4166-bcb6-126dfa73d0ee}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{db4208a6-bb95-4c3f-af14-04a7e771af0a}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Hardware">
+      <UniqueIdentifier>{676bee51-6004-4005-963c-7b04116e475a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PWDLG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SYSTEMTRAY.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceTalk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceTalkDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ClientTalk\hardware\UsbDevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PWDLG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SYSTEMTRAY.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceTalkDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceTalk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ClientTalk\hardware\hidpi.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ClientTalk\hardware\hidsdi.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ClientTalk\hardware\hidusage.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ClientTalk\hardware\UsbDevice.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ReadMe.txt" />
+    <CustomBuild Include="res\ServiceTalk.ico">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\ServiceTalk.rc2">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ServiceTalk.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\ClientTalk\hardware\hid.lib">
+      <Filter>Hardware</Filter>
+    </Library>
+    <Library Include="..\ClientTalk\hardware\hidclass.lib">
+      <Filter>Hardware</Filter>
+    </Library>
+    <Library Include="..\ClientTalk\hardware\hidparse.lib">
+      <Filter>Hardware</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
