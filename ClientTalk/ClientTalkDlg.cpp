@@ -6,6 +6,7 @@
 #include "ClientTalkDlg.h"
 #include "configdeal.h"
 #include <mmsystem.h>
+#include <afxpriv.h>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -14,7 +15,6 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
-CClientTalkDlg * CClientTalkDlg::pTalkCallDlg=0;
 class CAboutDlg : public CDialog
 {
 public:
@@ -62,15 +62,14 @@ END_MESSAGE_MAP()
 
 CClientTalkDlg::CClientTalkDlg(CWnd* pParent /*=NULL*/)
 : CDialog(CClientTalkDlg::IDD, pParent)
-, m_usbDevice(0x258A, 0x001B)
 , m_callStatus(INITIAL)
+, m_pUsbDevice(NULL)
 {
 	//{{AFX_DATA_INIT(CTalkCallDlg)
 	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	pTalkCallDlg=this;
 	ISCall=false;
 }
 
@@ -99,6 +98,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CTalkCallDlg message handlers
+static CClientTalkDlg *spClientTalkDlg = NULL;
 
 BOOL CClientTalkDlg::OnInitDialog()
 {
@@ -106,7 +106,7 @@ BOOL CClientTalkDlg::OnInitDialog()
 	
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
-	
+	spClientTalkDlg = this;
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != NULL)
 	{
@@ -140,13 +140,18 @@ BOOL CClientTalkDlg::OnInitDialog()
 	::SetWindowPos(m_hWnd,  HWND_TOPMOST ,
 		0, 0, 50,50, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
-	//初始化硬件	
-	m_usbDevice.SetOwner(m_hWnd);
-	m_usbDevice.ConnectDevice();
-	m_usbDevice.StartMonitor();
+	GetConfigInfo();
 
+	//VID:0x258A, PID:0x001B
+	m_pUsbDevice = new CUsbDevice(m_dwVID, m_dwPID);
+	//初始化硬件	
+	m_pUsbDevice->SetOwner(m_hWnd);
+	m_pUsbDevice->ConnectDevice();
+	m_pUsbDevice->StartMonitor();
+	
 	// TODO: Add extra initialization here
-	m_talk.Ini(MSG);
+	int CallBack(int type, char *p);
+	m_talk.Ini(CallBack);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -241,18 +246,52 @@ LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 }
 
 
-void CLibJingleDlg::PlaySound(const std::string &strSonndPath)
+void CClientTalkDlg::PlaySound(const CString &strSonndPath)
 {
 	//先停掉原有的声音
 	m_mciMusic.stop();
 
-	DWORD dwResult = m_mciMusic.play(this, CString(strSonndPath.c_str()) );  
+	DWORD dwResult = m_mciMusic.play(this, strSonndPath );  
 	if (dwResult != 0)  
 	{  
 		//beatLog_Error(("CLibJingleDlg", __FUNCDNAME__, "Play sound failed: %s", m_mciMusic.getErrorMsg(dwResult)));
 	}  
 }
 
+CString CClientTalkDlg::GetMoudleConfigFilePath()
+{
+	CString strFileName;
+	AfxGetModuleFileName(NULL, strFileName);
+	int nPos = strFileName.Delete(strFileName.GetLength() - 3, 3);
+	strFileName.Append("ini");
+
+	return strFileName;
+}
+
+void CClientTalkDlg::GetConfigInfo()
+{
+	CString strConfigFilePath = GetMoudleConfigFilePath();
+
+	//硬件PID,VID
+	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x258A, strConfigFilePath);
+	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x001B, strConfigFilePath);
+	char chBuffer[128] = {0};
+	GetPrivateProfileString("对讲机", "ServerIP", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strServiceIP = chBuffer;
+
+	//拨号铃声
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "ServerIP", "拨号铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathDialingBell = chBuffer;
+	//来电铃声
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "ServerIP", "来电铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathIncommingBell = chBuffer;
+	//忙音
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "ServerIP", "忙音铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathBusyBell = chBuffer;
+}
 
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
@@ -290,8 +329,6 @@ HCURSOR CClientTalkDlg::OnQueryDragIcon()
 	return (HCURSOR) m_hIcon;
 }
 
-
-
 void CClientTalkDlg::EndCall() 
 {
 	try
@@ -310,9 +347,10 @@ void CClientTalkDlg::EndCall()
 	}
 }
 
-int CClientTalkDlg::MSG(int type, char *p)
+
+
+int CallBack(int type, char *p)
 {
-	if(pTalkCallDlg==0)return 0;
 	switch(type)
 	{
 	case MSG_CallOut :
@@ -322,15 +360,14 @@ int CClientTalkDlg::MSG(int type, char *p)
 	case MSG_CallOk  :
 		{
 			CString str="对讲中--";
-			str=str+pTalkCallDlg->m_name;
-			
-			pTalkCallDlg->SetWindowText(str);
-			pTalkCallDlg->KillTimer(900);
+			str=str+spClientTalkDlg->m_name;
+			spClientTalkDlg->SetWindowText(str);
+			spClientTalkDlg->KillTimer(900);
 		}
 		break;
 	case MSG_CallClose :
-		pTalkCallDlg->ISCall=false;
-		pTalkCallDlg->SetWindowText("语音对讲呼叫机");
+		spClientTalkDlg->ISCall=false;
+		spClientTalkDlg->SetWindowText("语音对讲呼叫机");
 		break;
 	}
 	
@@ -360,6 +397,37 @@ void CClientTalkDlg::OnTimer(UINT nIDEvent)
 	CDialog::OnTimer(nIDEvent);
 }
 
+UINT __stdcall DialFunc(void *pvoid)
+{
+	//_tagJidFrom *pFrom = (_tagJidFrom *)pvoid;
+	CClientTalkDlg *pDlag = (CClientTalkDlg *)pvoid;
+	//if (NULL== pDlag) return 0;
+
+	//呼叫60s对方不接听，认为超时，关闭铃声
+	//TODO:是否要忙音
+	//TODO：是否需要通过配置文件设置超时时间
+	DWORD dwRet = WaitForMultipleObjects(2, pDlag->m_hDialEvents, FALSE, 10 * 1000);
+	if (dwRet ==  WAIT_OBJECT_0)//接听事件
+	{
+		//直接停止不行,需要发送消息
+		PostMessage(pDlag->m_hWnd, WM_STOPMUSIC, NULL, NULL);
+		pDlag->m_callStatus = ONLINE;
+		//重置为无信号状态
+		//调用 SetEvent设置有信号之后,需要调用reset设置为无信号
+		ResetEvent(pDlag->m_hDialEvents[0]);
+	}
+	else  //挂断事件,超时停止 或 异常 都停止
+	{
+		PostMessage(pDlag->m_hWnd, WM_STOPMUSIC, NULL, NULL);
+		//设置为无信号
+		ResetEvent(pDlag->m_hDialEvents[1]);
+		pDlag->m_callStatus = INITIAL;
+	}
+
+	//delete pFrom;
+
+	return 1;
+}
 
 void CClientTalkDlg::OnBnClickedBtnCall()
 {
@@ -368,21 +436,15 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 		EndCall();
 		Sleep(500);
 		/////////////
-		Cconfigdeal		cfgdeal;
-		char _IP[24];
-		if (cfgdeal.setfilename("ip.ini") != 0)
-			return ;
-		if (cfgdeal.readcfgdata("IP", "1L", _IP, sizeof(_IP)) != 0)
-			return;
+		
 		////////////
-		m_ip=_IP;
-		if(m_talk.Start(m_ip)==1)
+		if(m_talk.Start(m_strServiceIP.GetString())==1)
 		{
 			//主叫状态
 			m_callStatus = DIALING;
 			//状态1: 呼叫,可以自行挂断;
 			//状态2: 呼叫超时不接听,本地听到忙音
-			HANDLE hPlayMusic = (HANDLE)_beginthreadex(NULL, 0, DialFunc, pFrom, 0, 0);
+			HANDLE hPlayMusic = (HANDLE)_beginthreadex(NULL, 0, DialFunc, this, 0, 0);
 			CloseHandle(hPlayMusic);
 			PlaySound(m_strPathDialingBell);//打电话
 

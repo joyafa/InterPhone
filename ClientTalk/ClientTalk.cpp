@@ -90,6 +90,13 @@ BOOL CClientTalkApp::InitInstance()
 BOOL CClientTalkApp::PreTranslateMessage(MSG* pMsg) 
 {
 	// TODO: Add your specialized code here and/or call the base class
-	
+	if (pMsg->wParam == WM_KEYDOWN)
+	{
+		if (VK_ESCAPE == pMsg->lParam)
+		{
+			return TRUE;
+		}
+	}
+
 	return CWinApp::PreTranslateMessage(pMsg);
 }

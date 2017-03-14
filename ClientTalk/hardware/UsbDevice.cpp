@@ -220,12 +220,15 @@ CUsbDevice::~CUsbDevice()
 {
 	m_bExitRecvThread = true;
 	m_bExitSendThread = true;
+	//等待收发线程结束
 	if (INVALID_HANDLE_VALUE != m_hRecvThread)
 	{
+		WaitForSingleObject(m_hRecvThread, INFINITE);
 		CloseHandle(m_hRecvThread);
 	}
 	if (INVALID_HANDLE_VALUE != m_hSendThread)
 	{
+		WaitForSingleObject(m_hSendThread, INFINITE);
 		CloseHandle(m_hSendThread);
 	}
 	if (INVALID_HANDLE_VALUE != m_hidHandle)

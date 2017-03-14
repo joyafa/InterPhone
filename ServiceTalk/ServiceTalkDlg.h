@@ -11,6 +11,16 @@
 /////////////////////////////////////////////////////////////////////////////
 // CTalkDlg dialog
 #include "..\TalkDll\Interface.h"
+#include "..\ClientTalk\hardware\UsbDevice.h"
+#include "..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h"
+enum CallStatus
+{
+	INITIAL    = 0, //初始状态     
+	DIALING    = 1, //呼叫ing
+	ACCEPTING     , //接听ing: 被叫方,来电铃声提醒,未接听,可以挂断(Reject),可以接听
+	ONLINE        , //通话中,可以挂断(Hangup),或者等对方挂断(收到对方什么消息)
+	BUSYING         //呼叫超时,忙音
+};
 class CServiceTalkDlg : public CDialog
 {
 // Construction
@@ -41,14 +51,29 @@ protected:
 	//{{AFX_MSG(CTalkDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg LRESULT OnHandlePhone( WPARAM wParam, LPARAM lParam );
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnMenuitem32772();
 	afx_msg void OnClose();
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg LRESULT OnMCINotify(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnStopMusic(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+	CUsbDevice m_usbDevice;
+private:
+	//被叫事件: 0:接听事件;1:挂断事件
+	HANDLE m_hAcceptCallEvents[2];
+	//主叫事件: 0:接听事件;1:挂断事件
+	HANDLE m_hDialEvents[2];
+
+
+	//TODO:简单处理,1 客户端都是通过开关呼叫方,做呼叫相关的操作状态;
+	//              2 前台服务端,被叫方,只能做接听电话操作,考虑前台呼叫客户端的情况--> 因为有界面,采取界面按钮方式,而非事件方式
+	//记录当前状态: 主叫 还是 接听
+	CallStatus m_callStatus;
 };
 
 //{{AFX_INSERT_LOCATION}}

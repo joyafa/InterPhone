@@ -143,6 +143,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ClientTalk\hardware\UsbDevice.cpp" />
+    <ClCompile Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.cpp" />
     <ClCompile Include="PWDLG.cpp" />
     <ClCompile Include="ServiceTalk.cpp" />
     <ClCompile Include="ServiceTalkDlg.cpp" />
@@ -162,6 +163,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="..\ClientTalk\hardware\hidsdi.h" />
     <ClInclude Include="..\ClientTalk\hardware\hidusage.h" />
     <ClInclude Include="..\ClientTalk\hardware\UsbDevice.h" />
+    <ClInclude Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h" />
     <ClInclude Include="PWDLG.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ServiceTalkDlg.h" />

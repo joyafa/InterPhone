@@ -153,6 +153,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
   <ItemGroup>
     <ClCompile Include="configdeal.cpp" />
     <ClCompile Include="hardware\UsbDevice.cpp" />
+    <ClCompile Include="MCIPlayMusic\MCIPlayMusic.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
@@ -171,6 +172,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="hardware\hidsdi.h" />
     <ClInclude Include="hardware\hidusage.h" />
     <ClInclude Include="hardware\UsbDevice.h" />
+    <ClInclude Include="MCIPlayMusic\MCIPlayMusic.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="ClientTalk.h" />

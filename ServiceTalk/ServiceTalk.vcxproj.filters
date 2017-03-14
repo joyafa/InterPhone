@@ -16,6 +16,9 @@
     <Filter Include="Hardware">
       <UniqueIdentifier>{676bee51-6004-4005-963c-7b04116e475a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MCIMusic">
+      <UniqueIdentifier>{5b25dfe3-e74b-4d6f-969e-ac7f7c7ffc6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PWDLG.cpp">
@@ -35,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="..\ClientTalk\hardware\UsbDevice.cpp">
       <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.cpp">
+      <Filter>MCIMusic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="..\ClientTalk\hardware\UsbDevice.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h">
+      <Filter>MCIMusic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

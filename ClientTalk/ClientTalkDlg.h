@@ -9,6 +9,7 @@
 #endif // _MSC_VER > 1000
 #include "..\TalkDll\Interface.h"
 #include ".\hardware\UsbDevice.h"
+#include ".\MCIPlayMusic\MCIPlayMusic.h"
 
 enum CallStatus
 {
@@ -27,10 +28,15 @@ class CClientTalkDlg : public CDialog
 // Construction
 public:
 	CClientTalkDlg(CWnd* pParent = NULL);	// standard constructor
-	static CClientTalkDlg * pTalkCallDlg;
-	static int MSG(int type,char *p);
+	~CClientTalkDlg()
+	{
+		if (m_pUsbDevice)
+		{
+			delete m_pUsbDevice;
+		}
+	}
+	 int MSG(int type,char *p);
 	bool ISCall;
-	CString	m_ip;
 	CString	m_name;
 // Dialog Data
 	//{{AFX_DATA(CTalkCallDlg)
@@ -55,6 +61,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg LRESULT OnHandlePhone( WPARAM wParam, LPARAM lParam );
+	void PlaySound(const CString &strSonndPath);
+	CString GetMoudleConfigFilePath();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnTimer(UINT nIDEvent);
@@ -67,12 +75,25 @@ protected:
 	//结束现有的通话
 	void EndCall() ;
 
+	void GetConfigInfo();
 private:
-	CUsbDevice m_usbDevice;
+	CUsbDevice *m_pUsbDevice;
+	//硬件PID,VID
+	DWORD m_dwPID;
+	DWORD m_dwVID;
+	CString m_strServiceIP;
+	//拨号铃声
+	CString m_strPathDialingBell;
+	//来电铃声
+	CString m_strPathIncommingBell;
+	//忙音
+	CString m_strPathBusyBell;
+
+	CMCIPlayMusic m_mciMusic;
+
 public:
 	afx_msg void OnBnClickedBtnCall();
 
-private:
 	//被叫事件: 0:接听事件;1:挂断事件
 	HANDLE m_hAcceptCallEvents[2];
 	//主叫事件: 0:接听事件;1:挂断事件

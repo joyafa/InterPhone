@@ -16,6 +16,9 @@
     <Filter Include="Hardware">
       <UniqueIdentifier>{9d0ab5a3-374a-4ba0-b5da-bc911894524c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MCIMusic">
+      <UniqueIdentifier>{2ef4fb5d-7f84-4f97-ba58-2e0430c780fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="configdeal.cpp">
@@ -32,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="hardware\UsbDevice.cpp">
       <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="MCIPlayMusic\MCIPlayMusic.cpp">
+      <Filter>MCIMusic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="hardware\UsbDevice.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="MCIPlayMusic\MCIPlayMusic.h">
+      <Filter>MCIMusic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

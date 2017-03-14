@@ -5,6 +5,7 @@
 #include "ServiceTalk.h"
 #include "ServiceTalkDlg.h"
 #include "PWDLG.h"
+#include <mmsystem.h>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -61,6 +62,8 @@ END_MESSAGE_MAP()
 
 CServiceTalkDlg::CServiceTalkDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CServiceTalkDlg::IDD, pParent)
+, m_usbDevice(0x258A, 0x001B)
+, m_callStatus(INITIAL)
 {
 	//{{AFX_DATA_INIT(CTalkDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -77,6 +80,9 @@ void CServiceTalkDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
+#define WM_STOPMUSIC WM_USER + 2
+
+
 BEGIN_MESSAGE_MAP(CServiceTalkDlg, CDialog)
 	//{{AFX_MSG_MAP(CTalkDlg)
 	ON_WM_SYSCOMMAND()
@@ -87,6 +93,9 @@ BEGIN_MESSAGE_MAP(CServiceTalkDlg, CDialog)
 	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
+ON_MESSAGE(WM_PHONE,     &CServiceTalkDlg::OnHandlePhone)
+ON_MESSAGE(MM_MCINOTIFY, &CServiceTalkDlg::OnMCINotify)
+ON_MESSAGE(WM_STOPMUSIC, &CServiceTalkDlg::OnStopMusic)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -119,6 +128,10 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
+	//初始化硬件	
+	m_usbDevice.SetOwner(m_hWnd);
+	m_usbDevice.ConnectDevice();
+	m_usbDevice.StartMonitor();
 	// TODO: Add extra initialization here
 	m_talk.Ini();
 	SetTimer(990,100,NULL);
@@ -138,6 +151,88 @@ void CServiceTalkDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
+LRESULT CServiceTalkDlg::OnMCINotify(WPARAM wParam, LPARAM lParam)  
+{  
+	if (wParam == MCI_NOTIFY_SUCCESSFUL )  
+	{  
+		//呼叫
+		if(DIALING == m_callStatus)
+		{
+			PlaySound(m_strPathDialingBell);
+		}
+		//接听
+		else if ( ACCEPTING == m_callStatus)
+		{
+			PlaySound(m_strPathIncommingBell);
+		}
+		//忙音
+		else
+		{
+			PlaySound(m_strPathBusyBell);
+		}
+	}  
+	return 0;  
+}  
+LRESULT CServiceTalkDlg::OnStopMusic( WPARAM wParam, LPARAM lParam )
+{
+	m_mciMusic.stop();
+
+	return 1;
+}
+LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
+{
+	HardwareEventType event = (HardwareEventType)wParam;
+
+	switch (event)
+	{
+		//呼叫
+	case LEFT_KEY:
+		//呼叫模式, 因为收到来电,状态会变成ACCEPTING
+		if (INITIAL == m_callStatus)
+		{
+			OnBnClickedBtnCall();
+		}
+		break;
+		//挂断
+	case RIGHT_KEY:
+		//主叫方通话中
+		if (ONLINE == m_callStatus )
+		{
+			//挂断 hangup
+			EndCall();
+		}
+		else if ( DIALING == m_callStatus )//拨号响铃...
+		{
+			//取消拨号了  TODO: 取消拨号是怎么弄的???
+			//SetEvent();
+			//m_pCallDialog->ShowWindow(SW_HIDE);
+			m_callStatus = INITIAL;
+		}
+		else if (ACCEPTING == m_callStatus)//来电响铃...
+		{
+			//reject
+			SetEvent(m_hAcceptCallEvents[1]);
+			//m_pCallCommingDialog->ShowWindow(SW_HIDE);
+			m_callStatus = INITIAL;
+		}
+		break;
+	}
+
+	return 1;
+}
+
+
+void CLibJingleDlg::PlaySound(const std::string &strSonndPath)
+{
+	//先停掉原有的声音
+	m_mciMusic.stop();
+
+	DWORD dwResult = m_mciMusic.play(this, CString(strSonndPath.c_str()) );  
+	if (dwResult != 0)  
+	{  
+		//beatLog_Error(("CLibJingleDlg", __FUNCDNAME__, "Play sound failed: %s", m_mciMusic.getErrorMsg(dwResult)));
+	}  
+}
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
