@@ -17,19 +17,18 @@ void RecvThreadFunction(HANDLE m_hidHandle);
 void SendThreadFunction(HANDLE m_hidHandle);
 
 //左键数据:           
-char g_leftKey[]  = {0x00, 0xA5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+char g_leftKey[]  = {0x00, 0x00, 0x00, 0xA5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 //右键数据:           
-char g_rightKey[] = {0x00, 0x00, 0xA6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+char g_rightKey[] = {0x00, 0x00, 0x00, 0x00, 0xA6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void  RecvThreadFunction(LPVOID lpParameter   )
 {
 	CUsbDevice *pUsbDevice = (CUsbDevice *)lpParameter;
-	char *recvDataBuf=new char[64];
+	char *recvDataBuf = new char[64];
 	DWORD recvdBytes;
 	HANDLE hEventObject;
 	PHIDP_PREPARSED_DATA PreparsedData;
 	HIDP_CAPS Capabilities;
-	BOOL i =1;
 	bool flag=FALSE;
 	OVERLAPPED HIDOverlapped;
 	hEventObject=CreateEvent(NULL,TRUE,TRUE,NULL);
@@ -54,28 +53,24 @@ void  RecvThreadFunction(LPVOID lpParameter   )
 	{
 		ResetEvent(hEventObject);
 		ZeroMemory(recvDataBuf,64);
-		BOOL bRet=ReadFile(pUsbDevice->m_hidHandle, recvDataBuf,Capabilities.InputReportByteLength,
-			&recvdBytes,(LPOVERLAPPED)&HIDOverlapped); //接收数据	
+		ReadFile(
+			pUsbDevice->m_hidHandle, 
+			recvDataBuf,
+			Capabilities.InputReportByteLength,
+			&recvdBytes,
+			(LPOVERLAPPED)&HIDOverlapped ); //接收数据	
 		
-		if (!bRet) 
-		{
-			ULONG  tang=GetLastError();
-			Sleep(1);
-			continue;
-		}
 		DWORD dwRet = WaitForSingleObject(hEventObject,5000);
 		if(WAIT_TIMEOUT == dwRet || WAIT_ABANDONED == dwRet )//如超时返回则取消操作
 		{
 			CancelIo(pUsbDevice->m_hidHandle);
-			Sleep(1);
-			continue;
 		}
-		if(WAIT_OBJECT_0 == dwRet )
+		else if (WAIT_OBJECT_0 == dwRet)//if(bRetValue==1)//不是超时返回则显示数据
 		{			
 			HardwareEventType hardwareEvent = UNKNOWN_KEY;
-
+			///检查左键
 			int pos = 0;
-			for ( pos=0;pos<12;++pos)
+			for ( ;pos<6;++pos)
 			{
 				if (g_leftKey[pos] != recvDataBuf[pos])
 				{
@@ -83,22 +78,25 @@ void  RecvThreadFunction(LPVOID lpParameter   )
 				}
 			}
 		
-			if (pos < 12)
+			if (pos == 6)
 			{
 				hardwareEvent = LEFT_KEY;
 			}
-
-			for (int pos=0;hardwareEvent == UNKNOWN_KEY  && pos<12;++pos)
+			else
 			{
-				if (g_leftKey[pos] != recvDataBuf[pos])
+				//检查右键
+				for (pos=0;pos<6;++pos)
 				{
-					break;
+					if (g_rightKey[pos] != recvDataBuf[pos])
+					{
+						break;
+					}
 				}
-			}
 
-			if (pos < 12)
-			{
-				hardwareEvent = LEFT_KEY;
+				if (pos == 6)
+				{
+					hardwareEvent = RIGHT_KEY;
+				}
 			}
 
 			SendMessage(pUsbDevice->m_hWnd, WM_PHONE, (WPARAM)hardwareEvent, (LPARAM)NULL);
@@ -213,7 +211,6 @@ CUsbDevice::CUsbDevice( int vid, int pid )
 	, m_bExitRecvThread(false)
 	, m_bExitSendThread(false)
 {
-	m_strDevicePath = _T("\\\\?\\hid#vid_258a&pid_001b&mi_00#8&30c6ddd8&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}");
 }
 
 CUsbDevice::~CUsbDevice()
@@ -239,12 +236,6 @@ CUsbDevice::~CUsbDevice()
 
 bool CUsbDevice::ConnectDevice()
 {
-#if 0
-	int deviceNo=0;
-	ULONG m_MaxDataLen;
-	char tem[100]="";
-	char szText[64];
-
 	if(m_hidHandle!=INVALID_HANDLE_VALUE)
 	{
 		 TRACE("设备已连接! \n");
@@ -254,8 +245,13 @@ bool CUsbDevice::ConnectDevice()
 	GUID hidGuid;
 	HidD_GetHidGuid(&hidGuid);//取得HID类别的GUID
 
-	HDEVINFO hDevInfo=SetupDiGetClassDevs(&hidGuid,NULL,NULL,
-		(DIGCF_PRESENT|DIGCF_DEVICEINTERFACE));//获取HID设备信息
+	HDEVINFO hDevInfo=SetupDiGetClassDevs(
+		&hidGuid,
+		NULL,
+		NULL,
+		(DIGCF_PRESENT|DIGCF_DEVICEINTERFACE)
+		);//获取HID设备信息
+
 	if(!hDevInfo)//失败则报错
 	{
          TRACE("获取HID设备信息失败!");
@@ -265,6 +261,8 @@ bool CUsbDevice::ConnectDevice()
 	SP_DEVICE_INTERFACE_DATA devInfoData;
 	devInfoData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
 	SetLastError(NO_ERROR);
+
+	int deviceNo=0;
 	while(GetLastError()!=ERROR_NO_MORE_ITEMS)
 	{
 		if(SetupDiEnumInterfaceDevice  (hDevInfo,0,&hidGuid,deviceNo,&devInfoData))//识别HID接口
@@ -287,14 +285,14 @@ bool CUsbDevice::ConnectDevice()
 			OutputDebugStringA("DvicePath: ");
 			OutputDebugString(devDetail->DevicePath);
 			OutputDebugStringA("\n");
-			/*OutputDebugString("DviceGUID: ");
-			OutputDebugString(devInfoData.InterfaceClassGuid.);*/
 			//打开设备,并获得设备句柄
-			 m_hidHandle=CreateFile(devDetail->DevicePath,
+			 m_hidHandle=CreateFile(
+				 devDetail->DevicePath,
 				GENERIC_READ|GENERIC_WRITE,
 				FILE_SHARE_READ|FILE_SHARE_WRITE,
-				NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
-			ULONG i = GetLastError();
+				NULL,
+				OPEN_EXISTING,
+				FILE_FLAG_OVERLAPPED,NULL);
 			//循环直到找到可以访问的设备
 			if(m_hidHandle==INVALID_HANDLE_VALUE)
 			{
@@ -304,6 +302,7 @@ bool CUsbDevice::ConnectDevice()
 				deviceNo++;
 				continue;
 			}
+
 			_HIDD_ATTRIBUTES hidAttributes;
 			//获取厂商ID和设备ID
 			if(!HidD_GetAttributes(m_hidHandle,&hidAttributes))
@@ -312,43 +311,33 @@ bool CUsbDevice::ConnectDevice()
 				deviceNo++;
 				continue;
 			}
-			//如是要找的设备,则显示设备已连接
-			if(m_usbVid==hidAttributes.VendorID && m_usbPid==hidAttributes.ProductID)
+			//如是要找的设备,则显示设备已连接			
+			if(m_usbVid==hidAttributes.VendorID && m_usbPid==hidAttributes.ProductID  )
 			{
-				char version[100]="";
-				sprintf(version,"设备找到：HANDLE: 0x%p, VID:%04X, PID:%04X, ver:%X\r\n【是】连接，【否】继续找下一个",m_hidHandle, hidAttributes.VendorID, hidAttributes.ProductID, hidAttributes.VersionNumber);
-				m_MaxDataLen=MAX_DATA_LEN;	
-				OutputDebugStringA(version);
-				OutputDebugStringA("\n");
-				deviceNo++;
-				if (IDYES == MessageBoxA(NULL,version,"test", MB_YESNO))
+				CString strDevicePath(devDetail->DevicePath);
+				strDevicePath.MakeLower();	
+			
+				//TODO:  hid#vid_258a&pid_001b&mi_00  mi_00 不确定,测试过几台机器是对的
+				if (-1 != strDevicePath.Find("&mi_00"))
 				{
+					char version[100]="";
+				    sprintf(version,"设备找到：HANDLE: 0x%p, VID:%04X, PID:%04X, ver:%X\r\n【是】连接，【否】继续找下一个",m_hidHandle, hidAttributes.VendorID, hidAttributes.ProductID, hidAttributes.VersionNumber);
+				    OutputDebugStringA(version);
+				    OutputDebugStringA("\n");
 					break;
-				}
+				}				
 			}
-			else//如不是要找的设备,则关闭此设备,再循环查找设备
+
 			{
 				CloseHandle(m_hidHandle);
+				m_hidHandle = INVALID_HANDLE_VALUE;
 				deviceNo++;
 			}
 		}
 	}
 	
 	SetupDiDestroyDeviceInfoList(hDevInfo);
-#else
-	m_hidHandle=CreateFile(m_strDevicePath,
-		GENERIC_READ|GENERIC_WRITE,
-		FILE_SHARE_READ|FILE_SHARE_WRITE,
-		NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
-	ULONG i = GetLastError();
-	//循环直到找到可以访问的设备
-	if(m_hidHandle==INVALID_HANDLE_VALUE)
-	{
-		char buf[128];
-		sprintf(buf, "%s CreateFile failed: %d \n", m_strDevicePath, GetLastError());
-		OutputDebugStringA(buf);
-	}
-#endif
+
 	//设备未连接,则显示
 	return (m_hidHandle != INVALID_HANDLE_VALUE);
 }

@@ -206,7 +206,7 @@ LRESULT CClientTalkDlg::OnStopMusic( WPARAM wParam, LPARAM lParam )
 LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 {
 	HardwareEventType event = (HardwareEventType)wParam;
-
+    TRACE("%s,EVENT: %d\n", __FUNCTION__, event);
 	switch (event)
 	{
 		//呼叫
@@ -239,6 +239,9 @@ LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			//m_pCallCommingDialog->ShowWindow(SW_HIDE);
 			m_callStatus = INITIAL;
 		}
+		break;
+	default:
+		TRACE("%s,EVENT: %d 无效按键,暂不处理!!!\n", __FUNCTION__, event);
 		break;
 	}
 
@@ -281,15 +284,15 @@ void CClientTalkDlg::GetConfigInfo()
 
 	//拨号铃声
 	memset(chBuffer, 0, sizeof(chBuffer));
-	GetPrivateProfileString("对讲机", "ServerIP", "拨号铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	GetPrivateProfileString("对讲机", "拨号铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
 	m_strPathDialingBell = chBuffer;
 	//来电铃声
 	memset(chBuffer, 0, sizeof(chBuffer));
-	GetPrivateProfileString("对讲机", "ServerIP", "来电铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	GetPrivateProfileString("对讲机", "来电铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
 	m_strPathIncommingBell = chBuffer;
 	//忙音
 	memset(chBuffer, 0, sizeof(chBuffer));
-	GetPrivateProfileString("对讲机", "ServerIP", "忙音铃声", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	GetPrivateProfileString("对讲机", "忙音铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
 	m_strPathBusyBell = chBuffer;
 }
 

@@ -6,6 +6,7 @@
 #include "ServiceTalkDlg.h"
 #include "PWDLG.h"
 #include <mmsystem.h>
+#include <afxpriv.h>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -62,8 +63,8 @@ END_MESSAGE_MAP()
 
 CServiceTalkDlg::CServiceTalkDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CServiceTalkDlg::IDD, pParent)
-, m_usbDevice(0x258A, 0x001B)
 , m_callStatus(INITIAL)
+, m_pUsbDevice(NULL)
 {
 	//{{AFX_DATA_INIT(CTalkDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -129,12 +130,19 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	//初始化硬件	
-	m_usbDevice.SetOwner(m_hWnd);
-	m_usbDevice.ConnectDevice();
-	m_usbDevice.StartMonitor();
+	GetConfigInfo();
+
+	//VID:0x258A, PID:0x001B
+	m_pUsbDevice = new CUsbDevice(m_dwVID, m_dwPID);
+	//初始化硬件	
+	m_pUsbDevice->SetOwner(m_hWnd);
+	m_pUsbDevice->ConnectDevice();
+	m_pUsbDevice->StartMonitor();
+
 	// TODO: Add extra initialization here
 	m_talk.Ini();
 	SetTimer(990,100,NULL);
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -185,12 +193,12 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 
 	switch (event)
 	{
-		//呼叫
+		//接听
 	case LEFT_KEY:
 		//呼叫模式, 因为收到来电,状态会变成ACCEPTING
 		if (INITIAL == m_callStatus)
 		{
-			OnBnClickedBtnCall();
+			//OnBnClickedBtnCall();
 		}
 		break;
 		//挂断
@@ -199,7 +207,7 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 		if (ONLINE == m_callStatus )
 		{
 			//挂断 hangup
-			EndCall();
+			m_talk.End();
 		}
 		else if ( DIALING == m_callStatus )//拨号响铃...
 		{
@@ -221,16 +229,51 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 	return 1;
 }
 
+CString CServiceTalkDlg::GetMoudleConfigFilePath()
+{
+	CString strFileName;
+	AfxGetModuleFileName(NULL, strFileName);
+	int nPos = strFileName.Delete(strFileName.GetLength() - 3, 3);
+	strFileName.Append("ini");
 
-void CLibJingleDlg::PlaySound(const std::string &strSonndPath)
+	return strFileName;
+}
+
+void CServiceTalkDlg::GetConfigInfo()
+{
+	CString strConfigFilePath = GetMoudleConfigFilePath();
+
+	//硬件PID,VID
+	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x258A, strConfigFilePath);
+	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x001B, strConfigFilePath);
+	char chBuffer[128] = {0};
+	GetPrivateProfileString("对讲机", "ServerIP", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strServiceIP = chBuffer;
+
+	//拨号铃声
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "拨号铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathDialingBell = chBuffer;
+	//来电铃声
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "来电铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathIncommingBell = chBuffer;
+	//忙音
+	memset(chBuffer, 0, sizeof(chBuffer));
+	GetPrivateProfileString("对讲机", "忙音铃声", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
+	m_strPathBusyBell = chBuffer;
+}
+
+
+void CServiceTalkDlg::PlaySound(const CString &strSonndPath)
 {
 	//先停掉原有的声音
 	m_mciMusic.stop();
 
-	DWORD dwResult = m_mciMusic.play(this, CString(strSonndPath.c_str()) );  
+	DWORD dwResult = m_mciMusic.play(this, strSonndPath );  
 	if (dwResult != 0)  
 	{  
-		//beatLog_Error(("CLibJingleDlg", __FUNCDNAME__, "Play sound failed: %s", m_mciMusic.getErrorMsg(dwResult)));
+		//beatLog_Error(("CServiceTalkDlg", __FUNCDNAME__, "Play sound failed: %s", m_mciMusic.getErrorMsg(dwResult)));
 	}  
 }
 // If you add a minimize button to your dialog, you will need the code below

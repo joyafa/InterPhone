@@ -58,21 +58,23 @@ void CClientSocket::OnReceive(int nErrorCode)
 	struct TalkFrame *frame;
 	frame = (struct TalkFrame *)m_pBuffer;
 	
+  //读取完整 TalkFrame 帧的数据
 	int iLen = sizeof(struct TalkFrame);
 	while(iLen > 0)
-	{
-		int i = Receive (m_pBuffer + sizeof(struct TalkFrame) - iLen,iLen);
+	{  
+		int i = Receive (m_pBuffer + sizeof(struct TalkFrame) - iLen, iLen);
 		if (i == SOCKET_ERROR )
 			return ;
 		iLen -= i;
 	}
+
 	if (strcmp(frame->cFlag ,"TalkFrame") != 0)
 	{
 		return;
 	}
 
+	//读数据体
 	iLen = frame->iLen;
-	frame->iLen;
 	while (iLen > 0)
 	{
 		int i = Receive (

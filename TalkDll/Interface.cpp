@@ -34,7 +34,9 @@ m_bIni (FALSE)
 	
 	g_pOut = new CWaveOut();
 	m_pIn = new CMyWaveIn(m_pUdp);
+
 	m_sopListen = new CListenSocket(this,m_pIn,m_pUdp);
+	
 	//	m_sopSend = new CSendClient(m_pIn,this);
 	m_sopSend=0;
 	m_CallBackFun=0;
@@ -172,7 +174,7 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 		m_CallBackFun=__CallBackFun;
 		if (m_bIni)
 		{
-			TRACE("You have ini the talk model.\n");
+			TRACE("You have in the talk model.\n");
 			return FALSE;
 		}
 		//创建tcp连接
@@ -180,6 +182,7 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 		{
 			goto Exit;
 		}
+		//监听
 		m_sopListen->Listen ();
 		//UDP 广播形式
 		if (!m_pRec->Ini ())

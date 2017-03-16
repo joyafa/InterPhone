@@ -114,12 +114,8 @@ BEGIN
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "Comments", "湖南新软件"
-            VALUE "FileDescription", "TalkCall Microsoft 基础类应用程序"
             VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "TalkCall"
-            VALUE "LegalCopyright", "版权所有 (C) 2005 萧李"
-            VALUE "OriginalFilename", "TalkCall.EXE"
+            VALUE "LegalCopyright", "版权所有 (C) "
             VALUE "ProductName", "语音对讲机应用程序"
             VALUE "ProductVersion", "1, 0, 0, 1"
         END

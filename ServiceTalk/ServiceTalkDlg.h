@@ -62,7 +62,9 @@ protected:
 	afx_msg LRESULT OnStopMusic(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-	CUsbDevice m_usbDevice;
+	void GetConfigInfo();
+	void PlaySound(const CString &strSonndPath);
+	CString GetMoudleConfigFilePath();
 private:
 	//被叫事件: 0:接听事件;1:挂断事件
 	HANDLE m_hAcceptCallEvents[2];
@@ -74,6 +76,19 @@ private:
 	//              2 前台服务端,被叫方,只能做接听电话操作,考虑前台呼叫客户端的情况--> 因为有界面,采取界面按钮方式,而非事件方式
 	//记录当前状态: 主叫 还是 接听
 	CallStatus m_callStatus;
+	CUsbDevice *m_pUsbDevice;
+	//硬件PID,VID
+	DWORD m_dwPID;
+	DWORD m_dwVID;
+	CString m_strServiceIP;
+	//拨号铃声
+	CString m_strPathDialingBell;
+	//来电铃声
+	CString m_strPathIncommingBell;
+	//忙音
+	CString m_strPathBusyBell;
+
+	CMCIPlayMusic m_mciMusic;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -69,6 +69,4 @@ public:
 	bool m_bExitRecvThread;
 	//退出发送线程
 	bool m_bExitSendThread;
-	//设备路径
-	CString m_strDevicePath;
 };
