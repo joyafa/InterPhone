@@ -412,13 +412,6 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			m_talk.End();
 			m_callStatus = INITIAL;
 		}
-		else if ( DIALING == m_callStatus )//拨号响铃...
-		{
-			//取消拨号了  TODO: 取消拨号是怎么弄的???
-			//SetEvent();
-			//m_pCallDialog->ShowWindow(SW_HIDE);
-			m_callStatus = INITIAL;
-		}
 		else if (ACCEPTING == m_callStatus)//来电响铃...
 		{
 			//reject
@@ -447,8 +440,8 @@ void CServiceTalkDlg::GetConfigInfo()
 	CString strConfigFilePath = GetMoudleConfigFilePath();
 
 	//硬件PID,VID
-	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x258A, strConfigFilePath);
-	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x001B, strConfigFilePath);
+	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x001B, strConfigFilePath);
+	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x258A, strConfigFilePath);
 	char chBuffer[128] = {0};
 	GetPrivateProfileString("对讲机", "ServerIP", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
 	m_strServiceIP = chBuffer;

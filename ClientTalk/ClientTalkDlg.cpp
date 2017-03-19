@@ -7,12 +7,13 @@
 #include "configdeal.h"
 #include <mmsystem.h>
 #include <afxpriv.h>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
+extern CClientTalkApp theApp;
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 class CAboutDlg : public CDialog
@@ -98,7 +99,6 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CTalkCallDlg message handlers
-static CClientTalkDlg *spClientTalkDlg = NULL;
 
 BOOL CClientTalkDlg::OnInitDialog()
 {
@@ -106,7 +106,6 @@ BOOL CClientTalkDlg::OnInitDialog()
 	
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
-	spClientTalkDlg = this;
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != NULL)
 	{
@@ -227,13 +226,13 @@ LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 		if (ONLINE == m_callStatus )
 		{
 			//挂断 hangup
+			m_callStatus = INITIAL;
 			EndCall();
 		}
 		else if ( DIALING == m_callStatus )//拨号响铃...
 		{
-			//取消拨号了  TODO: 取消拨号是怎么弄的???
-			//SetEvent();
-			//m_pCallDialog->ShowWindow(SW_HIDE);
+			SetEvent(m_hDialEvents[1]);
+			EndCall();
 			m_callStatus = INITIAL;
 		}
 		
@@ -274,8 +273,8 @@ void CClientTalkDlg::GetConfigInfo()
 	CString strConfigFilePath = GetMoudleConfigFilePath();
 
 	//硬件PID,VID
-	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x258A, strConfigFilePath);
-	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x001B, strConfigFilePath);
+	m_dwPID = GetPrivateProfileInt("对讲机", "PID", 0x001B, strConfigFilePath);
+	m_dwVID = GetPrivateProfileInt("对讲机", "VID", 0x258A, strConfigFilePath);
 	char chBuffer[128] = {0};
 	GetPrivateProfileString("对讲机", "ServerIP", "", chBuffer, sizeof(chBuffer), strConfigFilePath);
 	m_strServiceIP = chBuffer;
@@ -334,7 +333,8 @@ void CClientTalkDlg::EndCall()
 {
 	try
 	{
-		if(m_bCall)
+		//TODO: 这里可能对所有的都要结束, 不需要判断正在通话中
+		//if(m_bCall)
 			m_talk.End();
 		m_bCall=false;
 		SetWindowText("语音呼叫机");
@@ -352,27 +352,36 @@ void CClientTalkDlg::EndCall()
 
 int CallBack(int type, char *p)
 {
+	CClientTalkDlg *pMainDlg = (CClientTalkDlg *)theApp.m_pMainWnd;
+
 	switch(type)
 	{
 	case MSG_CallOut :
 		//MessageBox(spClientTalkDlg->m_hWnd, p, "呼出", MB_ICONINFORMATION);
 		break;
 	case MSG_CallIn  :
-		MessageBox(spClientTalkDlg->m_hWnd, p, "呼入", MB_ICONINFORMATION);
+		MessageBox(pMainDlg->m_hWnd, p, "呼入", MB_ICONINFORMATION);
 		break;
 		break;
-	case MSG_CallOk  :
-
+	case MSG_CallOk  :		
 		{
+			SetEvent(pMainDlg->m_hDialEvents[0]);
+
 			CString str="与前台通话中...";
-			str=str+spClientTalkDlg->m_name;
-			spClientTalkDlg->SetWindowText(str);
-			spClientTalkDlg->KillTimer(900);
+			str=str + pMainDlg->m_name;
+			pMainDlg->SetWindowText(str);
+			pMainDlg->KillTimer(900);
 		}
 		break;
 	case MSG_CallClose :
-		spClientTalkDlg->m_bCall=false;
-		spClientTalkDlg->SetWindowText("语音呼叫机");
+		if (DIALING == pMainDlg->m_callStatus)
+		{
+			SetEvent(pMainDlg->m_hDialEvents[1]);	
+		    pMainDlg->EndCall();
+		}
+		pMainDlg->m_callStatus = INITIAL;
+		pMainDlg->m_bCall=false;
+		pMainDlg->SetWindowText("语音呼叫机");
 		break;
 	}
 	
@@ -501,13 +510,19 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 			
 			/*bAcceptCall = pFrom->bAcceptCall;
 			delete pFrom;*/
-
-			m_bCall=true;
-			m_name="正在连接前台...";
-			SetWindowText(m_name);
+			if (ONLINE == m_callStatus)
+			{
+				m_bCall=true;
+			    m_name="正在连接前台...";
+			    SetWindowText(m_name);
+			}
+			else
+			{
+				//主动取消拨号或者是已经挂掉
+			}
 			////m_name="服务前台";
 			//TODO: ?? 为什么
-			SetTimer(900,5000,NULL);
+			//SetTimer(900,5000,NULL);
 		}
 		else
 		{

@@ -83,6 +83,10 @@ void CSendClient::OnReceive(int nErrorCode)
 		m_pIn->EnableSend (TRUE);
 		m_pInterFace->m_bWork = TRUE;
 		break;
+	case TC_DISAGREE_TALK:
+		
+		//Close ();
+		break;
 	default:
 		break;
 	}

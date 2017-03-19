@@ -172,11 +172,12 @@ BOOL CInterface::End()
 {
 	try
 	{
-		if (!m_bWork)
+		//TODO: 这里可能对所有的都要结束, 不需要判断正在通话中
+		/*if (!m_bWork)
 		{
 			TRACE("The talk hasn't worked.\n");
 			return FALSE;
-		}
+		}*/
 
 		m_pIn->EnableSend (FALSE);
 		if(0!=m_sopSend)
@@ -286,9 +287,6 @@ BOOL CInterface::IncomingCall(CString ip)
 
 void CInterface::TalkStart(CString ip)
 {
-	CString temp;
-	temp.Format ("Talk now ,Ip: %s.",ip);
-	AfxMessageBox(temp);
 	if(m_CallBackFun!=0)
 	{
 		m_CallBackFun(MSG_CallOk,"对话");

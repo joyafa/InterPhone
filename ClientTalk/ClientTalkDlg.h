@@ -39,6 +39,8 @@ public:
 	 //呼叫类型,TRUE:呼叫;FALSE:呼入;
 	bool m_bCall;
 	CString	m_name;
+	//结束现有的通话
+	void EndCall() ;
 // Dialog Data
 	//{{AFX_DATA(CTalkCallDlg)
 	enum { IDD = IDD_TALKCALL_DIALOG };
@@ -73,8 +75,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	CInterface m_talk;
 
-	//结束现有的通话
-	void EndCall() ;
+
 
 	void GetConfigInfo();
 private:
