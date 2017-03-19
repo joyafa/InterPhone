@@ -12,7 +12,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CClientSocket command target
-
+//server端创建的与客户端通信的tcp连接
 class CClientSocket : public CSocket
 {
 // Attributes

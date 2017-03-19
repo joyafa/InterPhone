@@ -66,6 +66,33 @@ CInterface::~CInterface()
 	delete m_pRec;
 }
 
+CString CInterface::GetHostIpName()
+{
+	char chName[128] = {0};
+	if (SOCKET_ERROR  == gethostname(chName, sizeof(chName)))
+	{
+		TRACE("I can't get the name.\n");
+		return "";
+	}
+	struct hostent *phost;
+	phost = gethostbyname (chName);
+	if (phost == NULL)
+	{
+		TRACE("gethostbyname error .\n");
+		return "";
+	}
+
+	CString loip;
+	int i = 0;
+	while (phost->h_addr_list[i])
+	{
+		loip = inet_ntoa (*(struct in_addr *)phost->h_addr_list[i++]);
+		break;
+	}
+
+	return CString(loip) + ";" + chName;
+}
+
 BOOL CInterface::Start(const char *ip)
 {
 	try
@@ -75,8 +102,8 @@ BOOL CInterface::Start(const char *ip)
 		int i = 0;
 		CString loip;
 		
-		BOOL bRe;
-		bRe = FALSE;
+		BOOL bRet;
+		bRet = FALSE;
 		
 		if (m_bWork)
 		{
@@ -115,7 +142,8 @@ BOOL CInterface::Start(const char *ip)
 		if (!m_sopSend->Create ())
 		{
 			goto Exit;
-		}		
+		}
+		//客户端TCP方式连接服务器
 		m_sopSend->Connect (ip,TALK_COM_PORT);
 		if (GetLastError() != WSAEWOULDBLOCK)
 		{
@@ -123,13 +151,16 @@ BOOL CInterface::Start(const char *ip)
 		}
 		m_pUdp->SetIp (ip);
 		
-		bRe = TRUE;
+		bRet = TRUE;
 		m_bWork = TRUE;
 		goto Exit;
 Exit1:
-		if(0!=m_sopSend)m_sopSend->Close ();
+		if(0!=m_sopSend)
+		{
+			m_sopSend->Close ();
+		}
 Exit:
-		return bRe;
+		return bRet;
 	}
 	catch(...)
 	{
@@ -146,10 +177,16 @@ BOOL CInterface::End()
 			TRACE("The talk hasn't worked.\n");
 			return FALSE;
 		}
-		
+
 		m_pIn->EnableSend (FALSE);
-		if(0!=m_sopSend)m_sopSend->Close ();
-		if(0!=m_sopSend)m_sopSend->m_bConnect = FALSE;
+		if(0!=m_sopSend)
+		{
+			m_sopSend->Close ();
+		}
+		if(0!=m_sopSend)
+		{
+			m_sopSend->m_bConnect = FALSE;
+		}
 		m_sopListen->CloseClient ();
 		m_bWork = FALSE;
 		if(0!=m_sopSend)delete m_sopSend;
@@ -169,6 +206,7 @@ BOOL CInterface::End()
 
 BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 {
+	int nPort = TALK_COM_PORT;
 	try
 	{
 		m_CallBackFun=__CallBackFun;
@@ -178,8 +216,9 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 			return FALSE;
 		}
 		//创建tcp连接
-		if (!m_sopListen->Create (TALK_COM_PORT))
+		if (!m_sopListen->Create (nPort))
 		{
+			TRACE("Error:%d \n", WSAGetLastError());
 			goto Exit;
 		}
 		//监听
@@ -226,11 +265,11 @@ Exit:
 	return FALSE;
 }
 
-BOOL CInterface::IsConnect(CString ip)
+BOOL CInterface::IncomingCall(CString ip)
 {
 	if(m_CallBackFun!=0)
 	{
-		m_CallBackFun(MSG_CallIn,"呼入...");
+		m_CallBackFun(MSG_CallIn,"来电...");
 	}
 	//是否接听
 	if (IDYES ==  MessageBox(NULL,"talk?","talk",MB_YESNO))
@@ -247,9 +286,9 @@ BOOL CInterface::IsConnect(CString ip)
 
 void CInterface::TalkStart(CString ip)
 {
-	//	CString temp;
-	//	temp.Format ("Talk now ,Ip: %s.",ip);
-	//	AfxMessageBox(temp);
+	CString temp;
+	temp.Format ("Talk now ,Ip: %s.",ip);
+	AfxMessageBox(temp);
 	if(m_CallBackFun!=0)
 	{
 		m_CallBackFun(MSG_CallOk,"对话");
@@ -258,7 +297,7 @@ void CInterface::TalkStart(CString ip)
 
 void CInterface::TalkBeClose()
 {
-	//	AfxMessageBox("Talk be close.");
+	AfxMessageBox("Talk be close.");
 	if(m_CallBackFun!=0)
 	{
 		m_CallBackFun(MSG_CallClose,"关闭");
@@ -275,6 +314,8 @@ void CInterface::BeClose()
 			m_pIn->EnableSend (FALSE);
 			if(0!=m_sopSend)m_sopSend->Close ();
 			if(0!=m_sopSend)m_sopSend->m_bConnect = FALSE;
+
+			//生命周期结束,关闭socket
 			m_sopListen->CloseClient ();
 			m_bWork = FALSE;
 			
@@ -291,40 +332,48 @@ void CInterface::BeClose()
 	}
 }
 
+//连接服务器成功,发送信息,开始请求通话
 void CInterface::ConnectResult(int nErrorCode)
 {
 	try
 	{
+		//连接服务器失败
 		if (nErrorCode != 0)
 		{
 			m_bWork = FALSE;
 			TalkOnConnect (FALSE);
+
 			return ;
 		}
+
 		TalkOnConnect (TRUE);
 		
-		char buffer[32];
-		memset(buffer,0,32);
+		//发送客户端信息
+		//TODO: 加上开始通话时间 以及 挂断时候 通话时长
+		//TODO:list表中显示的图标用  电脑的 那个 图标 
+		char buffer[240];
+		memset(buffer,0,240);
 		struct TalkFrame *frame;
 		frame = (struct TalkFrame *)buffer;
-		sprintf(frame->cFlag,"TalkFrame");
-		
+		sprintf(frame->cFlag,"NETTALK");
+		sprintf(frame->chClientInfo, GetHostIpName());
 		frame->iLen = 0;
 		frame->iCom = TC_NORMAL_TALK;
-		if(0!=m_sopSend)m_sopSend->Send (buffer,sizeof(struct TalkFrame));
+		//发送客户端信息 
+		if(NULL != m_sopSend)
+		{
+			m_sopSend->Send (buffer,sizeof(struct TalkFrame));
+		}
 	}
 	catch(...)
 	{
 	}
 }
 
-void CInterface::TalkOnConnect(BOOL bRe)
+void CInterface::TalkOnConnect(BOOL bRet)
 {
-	//	CString t;
-	//	t.Format ("connect %d",bRe);
-	//	AfxMessageBox(t);
 	if(m_CallBackFun!=0)
 	{
-		m_CallBackFun(MSG_CallOut,"呼出...");
+		m_CallBackFun(MSG_CallOut, "正在呼叫前台...");
 	}
 }

@@ -54,7 +54,7 @@ void CSendClient::OnReceive(int nErrorCode)
 			return ;
 		iLen -= i;
 	}
-	if (strcmp(frame->cFlag ,"TalkFrame") != 0)
+	if (strcmp(frame->cFlag ,"NETTALK") != 0)
 	{
 		return;
 	}
@@ -78,6 +78,7 @@ void CSendClient::OnReceive(int nErrorCode)
 	{
 	case TC_AGREE_TALK:
 		GetPeerName (add,port);
+		//TODO:通知已经可以开始通话
 		m_pInterFace->TalkStart (add);
 		m_pIn->EnableSend (TRUE);
 		m_pInterFace->m_bWork = TRUE;

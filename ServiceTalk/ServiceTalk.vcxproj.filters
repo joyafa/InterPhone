@@ -42,6 +42,15 @@
     <ClCompile Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.cpp">
       <Filter>MCIMusic</Filter>
     </ClCompile>
+    <ClCompile Include="FriendList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IncommingDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PWDLG.h">
@@ -77,6 +86,15 @@
     <ClInclude Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h">
       <Filter>MCIMusic</Filter>
     </ClInclude>
+    <ClInclude Include="FriendList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IncommingDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ReadMe.txt" />
@@ -102,5 +120,16 @@
     <Library Include="..\ClientTalk\hardware\hidparse.lib">
       <Filter>Hardware</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\FndLstSel.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\FndLstSel2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\list_unselected.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

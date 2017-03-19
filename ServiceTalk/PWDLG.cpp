@@ -46,11 +46,13 @@ void PWDLG::OnOK()
 {
 	// TODO: Add extra validation here
 	this->UpdateData(TRUE);
+#if 0
 	if(strcmp(m_pw,"123!@#")!=0)
 	{
 		m_pw="";
 		this->UpdateData(FALSE);
 		return;
 	}
+#endif
 	CDialog::OnOK();
 }

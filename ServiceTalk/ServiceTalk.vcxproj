@@ -144,7 +144,10 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
   <ItemGroup>
     <ClCompile Include="..\ClientTalk\hardware\UsbDevice.cpp" />
     <ClCompile Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.cpp" />
+    <ClCompile Include="FriendList.cpp" />
+    <ClCompile Include="IncommingDialog.cpp" />
     <ClCompile Include="PWDLG.cpp" />
+    <ClCompile Include="ServiceInterface.cpp" />
     <ClCompile Include="ServiceTalk.cpp" />
     <ClCompile Include="ServiceTalkDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -164,8 +167,11 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="..\ClientTalk\hardware\hidusage.h" />
     <ClInclude Include="..\ClientTalk\hardware\UsbDevice.h" />
     <ClInclude Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h" />
+    <ClInclude Include="FriendList.h" />
+    <ClInclude Include="IncommingDialog.h" />
     <ClInclude Include="PWDLG.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ServiceInterface.h" />
     <ClInclude Include="ServiceTalkDlg.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="SYSTEMTRAY.H" />
@@ -183,7 +189,17 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <Library Include="..\ClientTalk\hardware\hidclass.lib" />
     <Library Include="..\ClientTalk\hardware\hidparse.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\FndLstSel.bmp" />
+    <None Include="res\FndLstSel2.bmp" />
+    <None Include="res\list_unselected.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ServiceTalk.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

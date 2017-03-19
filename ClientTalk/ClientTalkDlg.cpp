@@ -70,7 +70,7 @@ CClientTalkDlg::CClientTalkDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	ISCall=false;
+	m_bCall=false;
 }
 
 void CClientTalkDlg::DoDataExchange(CDataExchange* pDX)
@@ -141,6 +141,10 @@ BOOL CClientTalkDlg::OnInitDialog()
 		0, 0, 50,50, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 	GetConfigInfo();
+
+	//TODO: to be delete 主叫事件
+	m_hDialEvents[0] = CreateEventA(NULL, TRUE, FALSE, NULL);//主叫事件
+	m_hDialEvents[1] = CreateEventA(NULL, TRUE, FALSE, NULL);//主动挂断事件
 
 	//VID:0x258A, PID:0x001B
 	m_pUsbDevice = new CUsbDevice(m_dwVID, m_dwPID);
@@ -232,13 +236,7 @@ LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			//m_pCallDialog->ShowWindow(SW_HIDE);
 			m_callStatus = INITIAL;
 		}
-		else if (ACCEPTING == m_callStatus)//来电响铃...
-		{
-			//reject
-			SetEvent(m_hAcceptCallEvents[1]);
-			//m_pCallCommingDialog->ShowWindow(SW_HIDE);
-			m_callStatus = INITIAL;
-		}
+		
 		break;
 	default:
 		TRACE("%s,EVENT: %d 无效按键,暂不处理!!!\n", __FUNCTION__, event);
@@ -336,17 +334,17 @@ void CClientTalkDlg::EndCall()
 {
 	try
 	{
-		if(ISCall)
+		if(m_bCall)
 			m_talk.End();
-		ISCall=false;
-		SetWindowText("语音对讲呼叫机");
+		m_bCall=false;
+		SetWindowText("语音呼叫机");
 		KillTimer(900);
 		Sleep(100);
 	}
 	catch(...)
 	{
 
-		SetWindowText("语音对讲呼叫机");
+		SetWindowText("语音呼叫机");
 	}
 }
 
@@ -357,20 +355,24 @@ int CallBack(int type, char *p)
 	switch(type)
 	{
 	case MSG_CallOut :
+		//MessageBox(spClientTalkDlg->m_hWnd, p, "呼出", MB_ICONINFORMATION);
 		break;
 	case MSG_CallIn  :
+		MessageBox(spClientTalkDlg->m_hWnd, p, "呼入", MB_ICONINFORMATION);
+		break;
 		break;
 	case MSG_CallOk  :
+
 		{
-			CString str="对讲中--";
+			CString str="与前台通话中...";
 			str=str+spClientTalkDlg->m_name;
 			spClientTalkDlg->SetWindowText(str);
 			spClientTalkDlg->KillTimer(900);
 		}
 		break;
 	case MSG_CallClose :
-		spClientTalkDlg->ISCall=false;
-		spClientTalkDlg->SetWindowText("语音对讲呼叫机");
+		spClientTalkDlg->m_bCall=false;
+		spClientTalkDlg->SetWindowText("语音呼叫机");
 		break;
 	}
 	
@@ -409,7 +411,7 @@ UINT __stdcall DialFunc(void *pvoid)
 	//呼叫60s对方不接听，认为超时，关闭铃声
 	//TODO:是否要忙音
 	//TODO：是否需要通过配置文件设置超时时间
-	DWORD dwRet = WaitForMultipleObjects(2, pDlag->m_hDialEvents, FALSE, 10 * 1000);
+	DWORD dwRet = WaitForMultipleObjects(2, pDlag->m_hDialEvents, FALSE, 60 * 1000);
 	if (dwRet ==  WAIT_OBJECT_0)//接听事件
 	{
 		//直接停止不行,需要发送消息
@@ -432,13 +434,57 @@ UINT __stdcall DialFunc(void *pvoid)
 	return 1;
 }
 
+int   MessageLoop(   
+	HANDLE*   lphObjects,  //   handles   that   need   to   be   waited   on   
+	int       cObjects     //   number   of   handles   to   wait   on   
+	) 
+{   
+	//   The   message   loop   lasts   until   we   get   a   WM_QUIT   message, 
+	//   upon   which   we   shall   return   from   the   function. 
+	while   (TRUE) 
+	{ 
+		//   block-local   variable   
+		DWORD   result   ;   
+		MSG   msg;   
+		//   Read   all   of   the   messages   in   this   next   loop,   
+		//   removing   each   message   as   we   read   it. 
+		while   (PeekMessage(&msg,   NULL,   0,   0,   PM_REMOVE))   
+		{   
+			//   If   it 's   a   quit   message,   we 're   out   of   here. 
+			if   (msg.message   ==   WM_QUIT)     
+				return   -1;   
+			//   Otherwise,   dispatch   the   message. 
+			DispatchMessage(&msg);   
+		}   //   End   of   PeekMessage   while   loop. 
+		//   Wait   for   any   message   sent   or   posted   to   this   queue   
+		//   or   for   one   of   the   passed   handles   be   set   to   signaled. 
+		result   =   MsgWaitForMultipleObjects(cObjects,   lphObjects,   
+			FALSE,   INFINITE,   QS_ALLINPUT);   
+		//   The   result   tells   us   the   type   of   event   we   have. 
+		if   (result   ==   (WAIT_OBJECT_0   +   cObjects)) 
+		{ 
+			//   New   messages   have   arrived.   
+			//   Continue   to   the   top   of   the   always   while   loop   to   
+			//   dispatch   them   and   resume   waiting. 
+			continue; 
+		}   
+		else   
+		{   
+			//   One   of   the   handles   became   signaled.   
+			return result - WAIT_OBJECT_0; 
+		}   //   End   of   else   clause. 
+	}  
+
+	return -1;
+}   
+
+
 void CClientTalkDlg::OnBnClickedBtnCall()
 {
 	try
 	{
 		EndCall();
-		Sleep(500);
-		/////////////
+		Sleep(5000);		
 		
 		////////////
 		if(m_talk.Start(m_strServiceIP.GetString())==1)
@@ -447,25 +493,30 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 			m_callStatus = DIALING;
 			//状态1: 呼叫,可以自行挂断;
 			//状态2: 呼叫超时不接听,本地听到忙音
-			HANDLE hPlayMusic = (HANDLE)_beginthreadex(NULL, 0, DialFunc, this, 0, 0);
-			CloseHandle(hPlayMusic);
-			PlaySound(m_strPathDialingBell);//打电话
 
-			ISCall=true;
-			m_name="连接中--1连";
+			HANDLE hPlayMusic = (HANDLE)_beginthreadex(NULL, 0, DialFunc, this, 0, 0);			
+			PlaySound(m_strPathDialingBell);//打电话
+			MessageLoop(&hPlayMusic, 1);	
+			CloseHandle(hPlayMusic);
+			
+			/*bAcceptCall = pFrom->bAcceptCall;
+			delete pFrom;*/
+
+			m_bCall=true;
+			m_name="正在连接前台...";
 			SetWindowText(m_name);
-			m_name="1连";
+			////m_name="服务前台";
+			//TODO: ?? 为什么
 			SetTimer(900,5000,NULL);
-			//		((CButton *)(this->GetDlgItem(IDC_BUTTON1)))->SetState(TRUE);
 		}
 		else
 		{
-			SetWindowText("语音对讲呼叫机");
+			SetWindowText("语音呼叫机");
 		}
 	}
 	catch(...)
 	{
 
-		SetWindowText("语音对讲呼叫机");
+		SetWindowText("语音呼叫机");
 	}
 }

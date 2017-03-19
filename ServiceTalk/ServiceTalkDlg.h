@@ -10,9 +10,11 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CTalkDlg dialog
-#include "..\TalkDll\Interface.h"
 #include "..\ClientTalk\hardware\UsbDevice.h"
 #include "..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h"
+#include "friendlist.h"
+#include "ServiceInterface.h"
+#include "IncommingDialog.h"
 enum CallStatus
 {
 	INITIAL    = 0, //初始状态     
@@ -21,29 +23,41 @@ enum CallStatus
 	ONLINE        , //通话中,可以挂断(Hangup),或者等对方挂断(收到对方什么消息)
 	BUSYING         //呼叫超时,忙音
 };
+
+struct _tagCallFrom
+{
+	CString ip;
+	CWnd *pWnd;
+	bool bAcceptCall;
+};
+
+
 class CServiceTalkDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
 	CServiceTalkDlg(CWnd* pParent = NULL);	// standard constructor
-CInterface m_talk;
+	~CServiceTalkDlg();
+	CServiceInterface m_talk;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CTalkDlg)
 	enum { IDD = IDD_TALK_DIALOG };
-		// NOTE: the ClassWizard will add data members here
+	// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CTalkDlg)
-	public:
+public:
 	virtual BOOL DestroyWindow();
-	protected:
+	bool AcceptCallFrom(const char* ip);
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
+
 protected:
 	HICON m_hIcon;
 
@@ -51,6 +65,7 @@ protected:
 	//{{AFX_MSG(CTalkDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+
 	afx_msg LRESULT OnHandlePhone( WPARAM wParam, LPARAM lParam );
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -66,16 +81,12 @@ protected:
 	void PlaySound(const CString &strSonndPath);
 	CString GetMoudleConfigFilePath();
 private:
-	//被叫事件: 0:接听事件;1:挂断事件
-	HANDLE m_hAcceptCallEvents[2];
+
 	//主叫事件: 0:接听事件;1:挂断事件
 	HANDLE m_hDialEvents[2];
 
 
-	//TODO:简单处理,1 客户端都是通过开关呼叫方,做呼叫相关的操作状态;
-	//              2 前台服务端,被叫方,只能做接听电话操作,考虑前台呼叫客户端的情况--> 因为有界面,采取界面按钮方式,而非事件方式
-	//记录当前状态: 主叫 还是 接听
-	CallStatus m_callStatus;
+
 	CUsbDevice *m_pUsbDevice;
 	//硬件PID,VID
 	DWORD m_dwPID;
@@ -89,6 +100,17 @@ private:
 	CString m_strPathBusyBell;
 
 	CMCIPlayMusic m_mciMusic;
+
+	CIncommingDialog *m_pIncommingDlg;
+public:
+	CFriendList m_listClient;
+	//被叫事件: 0:接听事件;1:挂断事件
+	HANDLE m_hAcceptCallEvents[2];
+	//TODO:简单处理,1 客户端都是通过开关呼叫方,做呼叫相关的操作状态;
+	//              2 前台服务端,被叫方,只能做接听电话操作,考虑前台呼叫客户端的情况--> 因为有界面,采取界面按钮方式,而非事件方式
+	//记录当前状态: 主叫 还是 接听
+	CallStatus m_callStatus;
+	CString	m_name;
 };
 
 //{{AFX_INSERT_LOCATION}}

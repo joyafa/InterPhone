@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -27,18 +25,18 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -50,7 +48,7 @@ BEGIN
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
     "#endif //_WIN32\r\n"
-    "#include ""res\\Talk.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""res\\ServiceTalk.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
     "#endif\r\n"
     "\0"
@@ -66,15 +64,15 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\ServiceTalk.ico"
+IDR_MAINFRAME           ICON                    "res\\ServiceTalk.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOG 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 Talk"
 FONT 9, "宋体"
 BEGIN
@@ -84,18 +82,17 @@ BEGIN
     DEFPUSHBUTTON   "确定",IDOK,178,7,50,14,WS_GROUP
 END
 
-IDD_TALK_DIALOG DIALOGEX 0, 0, 94, 21
-STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+IDD_TALK_DIALOG DIALOGEX 0, 0, 130, 249
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "语音对讲机"
-FONT 9, "宋体"
+CAPTION "呼叫:服务端"
+FONT 10, "微软雅黑", 400, 0, 0x86
 BEGIN
-    LTEXT           "8733语音对讲机接收端",IDC_STATIC,7,7,80,8
+    CONTROL         "",IDC_LIST_CLIENT,"SysListView32",LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,-2,0,133,249
 END
 
-IDD_DIALOG_PW DIALOG DISCARDABLE  0, 0, 76, 44
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIALOG_PW DIALOG 0, 0, 76, 44
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "请输入退出密码"
 FONT 10, "System"
 BEGIN
@@ -104,8 +101,22 @@ BEGIN
     EDITTEXT        IDC_EDIT1,7,7,58,14,ES_PASSWORD | ES_AUTOHSCROLL
 END
 
+IDD_DIALOG_INCOMING DIALOGEX 0, 0, 185, 96
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "您有新的来电"
+FONT 12, "微软雅黑", 400, 0, 0x86
+BEGIN
+    DEFPUSHBUTTON   "接听",IDACCEPT,20,69,50,14
+    PUSHBUTTON      "挂断",IDREJECT,114,69,50,14
+    LTEXT           "IP地址:",IDC_STATIC,11,5,39,8
+    LTEXT           "计算机名称:",IDC_STATIC,11,25,39,8
+    LTEXT           "",IDC_STATIC_IPADDRESS,55,5,118,8
+    LTEXT           "Static",IDC_STATIC_COMPUTERNAME,55,25,118,8
+    LTEXT           "通话时间:",IDC_STATIC,11,45,39,8
+    LTEXT           "Static",IDC_STATIC_TALKTIME,55,45,118,8
+END
 
-#ifndef _MAC
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -128,15 +139,13 @@ BEGIN
     BEGIN
         BLOCK "080404B0"
         BEGIN
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "Talk Microsoft 基础类应用程序\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "Talk\0"
-            VALUE "LegalCopyright", "版权所有 (C) 2005\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "Talk.EXE\0"
-            VALUE "ProductName", "Talk 应用程序\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "FileDescription", "Talk Microsoft 基础类应用程序"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "Talk"
+            VALUE "LegalCopyright", "版权所有 (C) 2005"
+            VALUE "OriginalFilename", "Talk.EXE"
+            VALUE "ProductName", "Talk 应用程序"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -145,8 +154,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -154,7 +161,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -166,10 +173,8 @@ BEGIN
 
     IDD_TALK_DIALOG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 87
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 14
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 245
     END
 
     IDD_DIALOG_PW, DIALOG
@@ -178,6 +183,10 @@ BEGIN
         RIGHTMARGIN, 69
         TOPMARGIN, 7
         BOTTOMMARGIN, 37
+    END
+
+    IDD_DIALOG_INCOMING, DIALOG
+    BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -188,27 +197,36 @@ END
 // Menu
 //
 
-IDR_MENU_POP MENU DISCARDABLE 
+IDR_MENU_POP MENU
 BEGIN
     POPUP "m"
     BEGIN
-        MENUITEM "退出",                        ID_MENUITEM32772
+        MENUITEM "退出",                          ID_MENUITEM32772
     END
 END
 
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Bitmap
+//
+
+IDB_FNDLST_SEL          BITMAP                  "res\\FndLstSel.bmp"
+IDB_FNDLST_SEL2         BITMAP                  "res\\FndLstSel2.bmp"
+IDB_FNDLST_UNSEL        BITMAP                  "res\\list_unselected.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "关于 Talk(&A)..."
     IDP_SOCKETS_INIT_FAILED "Windows 通信端口初始化失败。"
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

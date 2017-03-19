@@ -53,6 +53,7 @@
 #define MSG_CallIn  1002
 #define MSG_CallOk  1003
 #define MSG_CallClose 1004
+#define MSG_ADDCLIENTUSER   1005
 
 class CMyWaveIn;
 class CWaveOut;
@@ -67,8 +68,8 @@ class AFX_EXT_CLASS CInterface
 public:
 	virtual void TalkBeClose();
 	virtual void TalkStart(CString ip);
-	virtual BOOL IsConnect(CString ip);
-	virtual void TalkOnConnect(BOOL bRe);
+	virtual BOOL IncomingCall(CString ip);
+	virtual void TalkOnConnect(BOOL bRet);
 
 	BOOL Ini(_CallBackFun __CallBackFun=0);
 	BOOL End();
@@ -76,6 +77,7 @@ public:
 
 	CInterface();
 	virtual ~CInterface();
+	CString GetHostIpName();
 protected:
 	void BeClose();
 	void ConnectResult(int nErrorCode);

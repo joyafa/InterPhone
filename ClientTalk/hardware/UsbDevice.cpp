@@ -21,10 +21,15 @@ char g_leftKey[]  = {0x00, 0x00, 0x00, 0xA5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 //右键数据:           
 char g_rightKey[] = {0x00, 0x00, 0x00, 0x00, 0xA6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
+enum KEYVALUE
+{
+	LEFTKEY_VALUE  = 0xa5,
+	RIGHTKEY_VALUE = 0xA6
+};
+
 void  RecvThreadFunction(LPVOID lpParameter   )
 {
 	CUsbDevice *pUsbDevice = (CUsbDevice *)lpParameter;
-	char *recvDataBuf = new char[64];
 	DWORD recvdBytes;
 	HANDLE hEventObject;
 	PHIDP_PREPARSED_DATA PreparsedData;
@@ -49,6 +54,9 @@ void  RecvThreadFunction(LPVOID lpParameter   )
 
 	NTSTATUS status=HidP_GetCaps(PreparsedData, &Capabilities);
 	
+	char *recvDataBuf = new char[64];
+	ZeroMemory(recvDataBuf,64);
+
 	while(!pUsbDevice->m_bExitRecvThread)
 	{
 		ResetEvent(hEventObject);
@@ -69,36 +77,22 @@ void  RecvThreadFunction(LPVOID lpParameter   )
 		{			
 			HardwareEventType hardwareEvent = UNKNOWN_KEY;
 			///检查左键
-			int pos = 0;
-			for ( ;pos<6;++pos)
+			BYTE byKeyValue = 0;
+			//按键输出6个数,求和
+			for (int pos = 0 ;pos<6;++pos)
 			{
-				if (g_leftKey[pos] != recvDataBuf[pos])
-				{
-					break;
-				}
+				byKeyValue += recvDataBuf[pos];
 			}
-		
-			if (pos == 6)
+		    
+			if (LEFTKEY_VALUE == byKeyValue)
 			{
 				hardwareEvent = LEFT_KEY;
 			}
-			else
+			else if (RIGHTKEY_VALUE == byKeyValue)
 			{
-				//检查右键
-				for (pos=0;pos<6;++pos)
-				{
-					if (g_rightKey[pos] != recvDataBuf[pos])
-					{
-						break;
-					}
-				}
-
-				if (pos == 6)
-				{
-					hardwareEvent = RIGHT_KEY;
-				}
+				hardwareEvent = RIGHT_KEY;
 			}
-
+			
 			SendMessage(pUsbDevice->m_hWnd, WM_PHONE, (WPARAM)hardwareEvent, (LPARAM)NULL);
 		}
 		Sleep(1);
@@ -210,6 +204,8 @@ CUsbDevice::CUsbDevice( int vid, int pid )
 	, m_hidHandle(INVALID_HANDLE_VALUE)
 	, m_bExitRecvThread(false)
 	, m_bExitSendThread(false)
+	, m_hSendThread(INVALID_HANDLE_VALUE)
+	, m_hRecvThread(INVALID_HANDLE_VALUE)
 {
 }
 
@@ -299,6 +295,7 @@ bool CUsbDevice::ConnectDevice()
 				char buf[128];
 				sprintf(buf, "%s CreateFile failed: %d \n", devDetail->DevicePath, GetLastError());
 				OutputDebugStringA(buf);
+				free(devDetail);
 				deviceNo++;
 				continue;
 			}
@@ -309,6 +306,7 @@ bool CUsbDevice::ConnectDevice()
 			{
 				CloseHandle(m_hidHandle);
 				deviceNo++;
+				free(devDetail);
 				continue;
 			}
 			//如是要找的设备,则显示设备已连接			
@@ -324,15 +322,15 @@ bool CUsbDevice::ConnectDevice()
 				    sprintf(version,"设备找到：HANDLE: 0x%p, VID:%04X, PID:%04X, ver:%X\r\n【是】连接，【否】继续找下一个",m_hidHandle, hidAttributes.VendorID, hidAttributes.ProductID, hidAttributes.VersionNumber);
 				    OutputDebugStringA(version);
 				    OutputDebugStringA("\n");
+					free(devDetail);
 					break;
 				}				
 			}
-
-			{
-				CloseHandle(m_hidHandle);
-				m_hidHandle = INVALID_HANDLE_VALUE;
-				deviceNo++;
-			}
+			//释放内存,继续查找
+			CloseHandle(m_hidHandle);
+			m_hidHandle = INVALID_HANDLE_VALUE;
+			free(devDetail);
+			deviceNo++;
 		}
 	}
 	

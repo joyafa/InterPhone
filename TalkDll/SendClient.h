@@ -11,7 +11,7 @@
 #include "Interface.h"
 /////////////////////////////////////////////////////////////////////////////
 // CSendClient command target
-
+//client端创建的与服务通信的tcp连接
 class CSendClient : public CAsyncSocket
 {
 // Attributes

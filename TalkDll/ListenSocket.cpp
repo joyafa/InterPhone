@@ -45,13 +45,17 @@ void CListenSocket::OnAccept(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	SOCKADDR add;
+	memset(&add, 0, sizeof(add));
+	add.sa_family = AF_INET;
+	//TODO: add需要清空,报异常
 	int iLen;
 	iLen = sizeof(SOCKADDR);
 	CSocket soTemp;
 	if (m_sopClient->m_bConnect )
 	{
 		TRACE("Someone connect but i have talk with someon.\n");
-		soTemp.Accept (*this);
+		//TODO: 连接已经存在,可以在这里通过sotemp发送提示信息给客户端
+		Accept (soTemp);
 		soTemp.Close ();
 		return ;
 	}

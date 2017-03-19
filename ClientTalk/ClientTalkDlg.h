@@ -36,7 +36,8 @@ public:
 		}
 	}
 	 int MSG(int type,char *p);
-	bool ISCall;
+	 //呼叫类型,TRUE:呼叫;FALSE:呼入;
+	bool m_bCall;
 	CString	m_name;
 // Dialog Data
 	//{{AFX_DATA(CTalkCallDlg)
@@ -94,8 +95,6 @@ private:
 public:
 	afx_msg void OnBnClickedBtnCall();
 
-	//被叫事件: 0:接听事件;1:挂断事件
-	HANDLE m_hAcceptCallEvents[2];
 	//主叫事件: 0:接听事件;1:挂断事件
 	HANDLE m_hDialEvents[2];
 

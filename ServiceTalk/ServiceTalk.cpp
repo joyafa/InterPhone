@@ -71,7 +71,7 @@ BOOL CServiceTalkApp::InitInstance()
 	m_pMainWnd = &dlg;
 	if (!m_TrayIcon.Create(NULL,                            // Parent window
 		WM_ICON_NOTIFY,                  // Icon notify message to use
-		_T("语音对讲机接收端"),  // tooltip
+		_T("服务台"),  // tooltip
 		AfxGetApp()->LoadIcon(IDR_MAINFRAME),//IDI_ASTERISK),  // Icon to use
 		IDR_MENU_POP))                 // ID of tray icon
 		return FALSE;

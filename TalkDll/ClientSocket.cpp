@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "ClientSocket.h"
 #include "head.h"
+#include <string>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -68,11 +69,12 @@ void CClientSocket::OnReceive(int nErrorCode)
 		iLen -= i;
 	}
 
-	if (strcmp(frame->cFlag ,"TalkFrame") != 0)
+	if (strcmp(frame->cFlag ,"NETTALK") != 0)
 	{
 		return;
 	}
 
+	std::string strIpName;
 	//读数据体
 	iLen = frame->iLen;
 	while (iLen > 0)
@@ -85,16 +87,22 @@ void CClientSocket::OnReceive(int nErrorCode)
 		iLen -= i;
 	}
 
-	CString add;
-	UINT port;
+	CString strClientPeerAddress;
+	UINT nClientPort;
 	switch (frame->iCom )
 	{
 	case TC_NORMAL_TALK:
+		//取到客户端信息,ip 名称, 服务端显示
+		strIpName = ((struct TalkFrame *)m_pBuffer)->chClientInfo;
+		m_pInterface->m_CallBackFun(MSG_ADDCLIENTUSER, const_cast<char *>(strIpName.c_str()));
 		memset(frame,0,sizeof (struct TalkFrame));
-		sprintf(frame->cFlag,"TalkFrame");
-		GetPeerName (add,port);
-		if (m_pInterface ->IsConnect (add))
+		sprintf(frame->cFlag,"NETTALK");
+		//获取对等连接的ip 和 端口
+		GetPeerName (strClientPeerAddress, nClientPort);
+		//TODO:这里应该是异步的,
+		if (m_pInterface ->IncomingCall (strIpName.c_str()) )
 		{
+			//接听
 			frame->iCom = TC_AGREE_TALK;
 			frame->iLen = 0;
 			if (SOCKET_ERROR  == Send (m_pBuffer,sizeof(struct TalkFrame)))
@@ -103,16 +111,20 @@ void CClientSocket::OnReceive(int nErrorCode)
 				break ;
 			};
 
-			m_pInterface->TalkStart (add);
-			m_pUdp->SetIp (add);
+			m_pInterface->TalkStart (strClientPeerAddress);
+			m_pUdp->SetIp (strClientPeerAddress);
 			m_pIn->EnableSend (TRUE);
 			m_pInterface->m_bWork = TRUE;
 			break;
-		};
-		frame->iCom = TC_DISAGREE_TALK;
-		frame->iLen = 0;
-		Send (m_pBuffer,sizeof(struct TalkFrame));
-		Close ();
+		}
+		else
+		{
+			//拒绝
+			frame->iCom = TC_DISAGREE_TALK;
+			frame->iLen = 0;
+			Send (m_pBuffer,sizeof(struct TalkFrame));
+			Close ();
+		}
 		break;
 	default:
 		break;
