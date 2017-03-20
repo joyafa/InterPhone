@@ -48,6 +48,7 @@ void CClientSocket::OnClose(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	m_bConnect = FALSE;
+	//服务端关掉客户端连接
 	m_pInterface->BeClose ();
 	
 	CSocket::OnClose(nErrorCode);

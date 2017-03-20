@@ -417,6 +417,7 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			//reject
 			SetEvent(m_hAcceptCallEvents[1]);
 			//m_pCallCommingDialog->ShowWindow(SW_HIDE);
+			m_talk.End();
 			m_callStatus = INITIAL;
 		}
 		break;

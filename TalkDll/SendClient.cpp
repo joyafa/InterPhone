@@ -93,6 +93,7 @@ void CSendClient::OnReceive(int nErrorCode)
 	CAsyncSocket::OnReceive(nErrorCode);
 }
 
+//客户端关掉连接
 void CSendClient::OnClose(int nErrorCode) 
 {
 	// TODO: Add your specialized code here and/or call the base class

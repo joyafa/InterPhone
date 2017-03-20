@@ -168,6 +168,7 @@ Exit:
 	return FALSE;
 }
 
+
 BOOL CInterface::End()
 {
 	try
@@ -175,33 +176,49 @@ BOOL CInterface::End()
 		//TODO: 这里可能对所有的都要结束, 不需要判断正在通话中
 		/*if (!m_bWork)
 		{
+			//服务端主动关掉client,拒绝接听时候操作
+			if (m_sopListen)
+			{
+				m_sopListen->CloseClient();
+			}
+
 			TRACE("The talk hasn't worked.\n");
 			return FALSE;
 		}*/
 
-		m_pIn->EnableSend (FALSE);
-		if(0!=m_sopSend)
+		if (m_pIn)
+		{
+			m_pIn->EnableSend (FALSE);
+		}
+
+		if(m_sopSend)
 		{
 			m_sopSend->Close ();
-		}
-		if(0!=m_sopSend)
-		{
 			m_sopSend->m_bConnect = FALSE;
 		}
+
 		m_sopListen->CloseClient ();
+
 		m_bWork = FALSE;
-		if(0!=m_sopSend)delete m_sopSend;
-		m_sopSend=0;
+		
+		if(m_sopSend)
+		{
+			delete m_sopSend;
+			m_sopSend = NULL;
+		}
+		
 		if(m_CallBackFun!=0)
 		{
 			m_CallBackFun(MSG_CallClose,"Talk be close.");
 		}
+
 		return TRUE;
 	}
 	catch(...)
 	{
 
 	}
+
 	return FALSE;
 }
 

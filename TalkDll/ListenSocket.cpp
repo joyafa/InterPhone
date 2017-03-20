@@ -73,6 +73,9 @@ void CListenSocket::OnAccept(int nErrorCode)
 
 void CListenSocket::CloseClient()
 {
-	m_sopClient->Close ();
-	m_sopClient->m_bConnect = FALSE;
+	if (m_sopClient->m_bConnect)
+	{
+		m_sopClient->Close ();
+		m_sopClient->m_bConnect = FALSE;
+	}
 }
