@@ -420,6 +420,7 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			m_talk.End();
 			m_callStatus = INITIAL;
 		}
+		m_pIncommingDlg->ShowWindow(SW_HIDE);
 		break;
 	}
 

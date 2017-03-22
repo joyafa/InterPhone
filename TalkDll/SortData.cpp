@@ -30,21 +30,21 @@ void CSortData::ReceiveData(char *pBuffer, int iLen)
 	m_pFrame = (struct Frame *)pBuffer;
 
 	TRACE("Rece %d %d .\n",iLen,m_pFrame->iIndex );
+	//丢包了
 	if (m_pFrame->iIndex < m_iLast + 1)
 	{
 		TRACE("Lost %d.\n",m_pFrame->iIndex);
 	}
-
+	//包连续
 	if (m_pFrame->iIndex == m_iLast + 1)
 	{
-		unsigned __int32 iTemp;
 		///play  //it is right next data in buffer 
-		Play(pBuffer + sizeof(struct Frame),60);
+		Play(pBuffer + sizeof(struct Frame), 60);
 		m_iLast = m_pFrame->iIndex ;
 		TRACE("Receive and paly %d.\n",m_iLast);
 		
-		iTemp = m_pFrame->iIndex;
-		int iNext;
+		unsigned __int32 iTemp = m_pFrame->iIndex;
+		int iNext= 0;
 		for (iNext= 0;iNext < DELAY_BUFFER;iNext ++)
 		{
 			if (m_iFill[iNext] != iTemp + 1)
@@ -62,8 +62,7 @@ void CSortData::ReceiveData(char *pBuffer, int iLen)
 				m_iFill[iTemp] = 0;
 			}
 			//move back
-			int iHead;
-			iHead = 0;
+			int iHead = 0;
 			for (iTemp = iNext;iTemp < DELAY_BUFFER;iTemp ++)
 			{
 				if (m_iFill[iTemp] != 0)
@@ -130,8 +129,8 @@ void CSortData::ReceiveData(char *pBuffer, int iLen)
 
 void CSortData::Play(char *pBuffer, int iLen)
 {
-	int iOut;
-	iOut = sizeof(m_cOut);
+	int iOut = 0;
+	//iOut = sizeof(m_cOut);
 	g_ACode.DecodeAudioData (pBuffer,iLen,m_cOut,&iOut);
 	g_pOut->Play (m_cOut,iOut);
 }

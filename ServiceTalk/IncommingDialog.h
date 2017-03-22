@@ -24,6 +24,7 @@ public:
 
 private:
 	CServiceTalkDlg *m_pServiceDlg;
+	DWORD m_dwCounts;
 public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

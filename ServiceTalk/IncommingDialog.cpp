@@ -36,10 +36,12 @@ END_MESSAGE_MAP()
 
 
 // CIncommingDialog 消息处理程序
-
+#define TIME_EVENT 1000
 
 void CIncommingDialog::OnBnClickedAccept()
 {
+	SetTimer(TIME_EVENT, 1000, NULL);
+	m_dwCounts = GetTickCount();
 	if (NULL != m_pServiceDlg)
 	{
 		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[0]);
@@ -51,7 +53,8 @@ void CIncommingDialog::OnBnClickedReject()
 {
 	if (NULL != m_pServiceDlg)
 	{
-		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[0]);
+		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[1]);
+		ShowWindow(SW_HIDE);
 	}
 }
 
@@ -72,7 +75,14 @@ BOOL CIncommingDialog::PreTranslateMessage(MSG* pMsg)
 
 void CIncommingDialog::OnTimer(UINT_PTR nIDEvent)
 {
-	
+	if (TIME_EVENT == nIDEvent)
+	{
+		DWORD dwTickCount = GetTickCount();
+		DWORD dwEscape    = (dwTickCount - m_dwCounts) / 1000;
+		CString strTime;
+		strTime.Format("%02d:%02d:%02d", dwEscape / 3600, dwEscape % 3600 / 60, dwEscape % 60);
+		SetDlgItemText(IDC_STATIC_TALKTIME, strTime);
+	}
 
 	CDialogEx::OnTimer(nIDEvent);
 }
