@@ -40,6 +40,18 @@ END_MESSAGE_MAP()
 
 void CIncommingDialog::OnBnClickedAccept()
 {
+	GetDlgItem(IDACCEPT)->ShowWindow(SW_HIDE);
+	CRect rect;
+	GetClientRect(&rect);
+
+	CRect rectRejcetButton;
+	GetDlgItem(IDREJECT)->GetClientRect(&rectRejcetButton);
+	int x = (rect.Width() - rectRejcetButton.Width() )  / 2;
+	GetDlgItem(IDREJECT)->GetWindowRect(&rect);
+	//ClientToScreen(&rectRejcetButton);
+	//TODO:topÖµ²»¶Ô
+	//GetDlgItem(IDREJECT)->MoveWindow(x, rect.top, rect.Width(), rect.Height());
+	Invalidate();
 	SetTimer(TIME_EVENT, 1000, NULL);
 	m_dwCounts = GetTickCount();
 	if (NULL != m_pServiceDlg)
@@ -51,9 +63,13 @@ void CIncommingDialog::OnBnClickedAccept()
 
 void CIncommingDialog::OnBnClickedReject()
 {
+	GetDlgItem(IDACCEPT)->ShowWindow(SW_NORMAL);
+	//GetDlgItem(IDREJECT)->MoveWindow(x, rectRejcetButton.top, rectRejcetButton.Width(), rectRejcetButton.Height());
+
 	if (NULL != m_pServiceDlg)
 	{
 		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[1]);
+		m_pServiceDlg->m_talk.End();
 		ShowWindow(SW_HIDE);
 	}
 }

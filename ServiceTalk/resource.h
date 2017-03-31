@@ -3,7 +3,6 @@
 // Used by ServiceTalk.rc
 //
 #define IDM_ABOUTBOX                    0x0010
-#define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
 #define IDD_TALK_DIALOG                 102
 #define IDP_SOCKETS_INIT_FAILED         103
@@ -22,7 +21,6 @@
 #define IDC_STATIC_COMPUTERNAME         1003
 #define IDACCEPT                        1004
 #define IDREJECT                        1005
-#define IDC_STATIC_COMPUTERNAME2        1006
 #define IDC_STATIC_TALKTIME             1006
 #define ID_MENUITEM32772                32772
 

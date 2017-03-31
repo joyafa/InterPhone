@@ -21,10 +21,10 @@ protected:
 public:
 	afx_msg void OnBnClickedAccept();
 	afx_msg void OnBnClickedReject();
+	DWORD m_dwCounts;
 
 private:
 	CServiceTalkDlg *m_pServiceDlg;
-	DWORD m_dwCounts;
 public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

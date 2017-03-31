@@ -14,49 +14,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 extern CClientTalkApp theApp;
-/////////////////////////////////////////////////////////////////////////////
-// CAboutDlg dialog used for App About
-class CAboutDlg : public CDialog
-{
-public:
-	CAboutDlg();
-	
-	// Dialog Data
-	//{{AFX_DATA(CAboutDlg)
-	enum { IDD = IDD_ABOUTBOX };
-	//}}AFX_DATA
-	
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CAboutDlg)
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-	
-	// Implementation
-protected:
-	//{{AFX_MSG(CAboutDlg)
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
-{
-	//{{AFX_DATA_INIT(CAboutDlg)
-	//}}AFX_DATA_INIT
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CAboutDlg)
-	//}}AFX_DATA_MAP
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-//{{AFX_MSG_MAP(CAboutDlg)
-// No message handlers
-//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CTalkCallDlg dialog
@@ -163,8 +120,6 @@ void CClientTalkDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
 	}
 	else
 	{
@@ -333,18 +288,16 @@ void CClientTalkDlg::EndCall()
 {
 	try
 	{
-		//TODO: 这里可能对所有的都要结束, 不需要判断正在通话中
-		//if(m_bCall)
+		if(m_bCall)
+		{
 			m_talk.End();
+		}
 		m_bCall=false;
-		SetWindowText("语音呼叫机");
-		KillTimer(900);
-		Sleep(100);
+		SetWindowText("结束通话");
 	}
 	catch(...)
 	{
-
-		SetWindowText("语音呼叫机");
+		SetWindowText("结束通话");
 	}
 }
 
@@ -360,14 +313,14 @@ int CallBack(int type, char *p)
 		//MessageBox(spClientTalkDlg->m_hWnd, p, "呼出", MB_ICONINFORMATION);
 		break;
 	case MSG_CallIn  :
-		MessageBox(pMainDlg->m_hWnd, p, "呼入", MB_ICONINFORMATION);
+		MessageBox(pMainDlg->m_hWnd, p, "来电", MB_ICONINFORMATION);
 		break;
 		break;
 	case MSG_CallOk  :		
 		{
 			SetEvent(pMainDlg->m_hDialEvents[0]);
 
-			CString str="与前台通话中...";
+			CString str="通话中...";
 			str=str + pMainDlg->m_name;
 			pMainDlg->SetWindowText(str);
 			pMainDlg->KillTimer(900);
@@ -381,7 +334,7 @@ int CallBack(int type, char *p)
 		}
 		pMainDlg->m_callStatus = INITIAL;
 		pMainDlg->m_bCall=false;
-		pMainDlg->SetWindowText("语音呼叫机");
+		pMainDlg->SetWindowText("通话关闭");
 		break;
 	}
 	
@@ -404,12 +357,7 @@ BOOL CClientTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	return CDialog::OnCommand(wParam, lParam);
 }
 
-void CClientTalkDlg::OnTimer(UINT nIDEvent) 
-{
-	// TODO: Add your message handler code here and/or call default
-	EndCall();
-	CDialog::OnTimer(nIDEvent);
-}
+
 
 UINT __stdcall DialFunc(void *pvoid)
 {
@@ -426,6 +374,7 @@ UINT __stdcall DialFunc(void *pvoid)
 		//直接停止不行,需要发送消息
 		PostMessage(pDlag->m_hWnd, WM_STOPMUSIC, NULL, NULL);
 		pDlag->m_callStatus = ONLINE;
+
 		//重置为无信号状态
 		//调用 SetEvent设置有信号之后,需要调用reset设置为无信号
 		ResetEvent(pDlag->m_hDialEvents[0]);
@@ -493,8 +442,7 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 	try
 	{
 		EndCall();
-		Sleep(5000);		
-		
+		SetWindowText("呼叫中...");
 		////////////
 		if(m_talk.Start(m_strServiceIP.GetString())==1)
 		{
@@ -508,30 +456,25 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 			MessageLoop(&hPlayMusic, 1);	
 			CloseHandle(hPlayMusic);
 			
-			/*bAcceptCall = pFrom->bAcceptCall;
-			delete pFrom;*/
 			if (ONLINE == m_callStatus)
 			{
 				m_bCall=true;
-			    m_name="正在连接前台...";
-			    SetWindowText(m_name);
+			    SetWindowText("通话中...");
 			}
 			else
 			{
-				//主动取消拨号或者是已经挂掉
+				m_bCall=false;
+				SetWindowText("拒绝接听!");
 			}
-			////m_name="服务前台";
-			//TODO: ?? 为什么
-			//SetTimer(900,5000,NULL);
 		}
 		else
 		{
-			SetWindowText("语音呼叫机");
+			SetWindowText("连接主机失败!");
 		}
 	}
 	catch(...)
 	{
 
-		SetWindowText("语音呼叫机");
+		SetWindowText("连接主机发现异常");
 	}
 }

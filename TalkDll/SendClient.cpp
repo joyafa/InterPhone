@@ -98,7 +98,8 @@ void CSendClient::OnClose(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	m_bConnect = FALSE;
-
+	DWORD dwError = WSAGetLastError();
+	TRACE("Close socket:%d \n", dwError);
 	m_pInterFace->BeClose ();
 
 	CAsyncSocket::OnClose(nErrorCode);

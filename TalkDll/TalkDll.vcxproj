@@ -18,6 +18,7 @@
     <SccProjectName />
     <SccLocalPath />
     <Keyword>MFCProj</Keyword>
+    <ProjectGuid>{13AB87B9-F895-7E64-DC2F-F590837CBFB1}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
@@ -200,6 +201,7 @@ copy /Y $(OutDir)$(TargetName)D.lib ..\lib</Command>
     <ClInclude Include="head.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="ListenSocket.h" />
+    <ClInclude Include="Log.hpp" />
     <ClInclude Include="MyWaveIn.h" />
     <ClInclude Include="RecSocket.h" />
     <ClInclude Include="Resource.h" />

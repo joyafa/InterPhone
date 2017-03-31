@@ -3,7 +3,6 @@
 // Used by ClientTalk.rc
 //
 #define IDM_ABOUTBOX                    0x0010
-#define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
 #define IDD_TALKCALL_DIALOG             102
 #define IDP_SOCKETS_INIT_FAILED         103

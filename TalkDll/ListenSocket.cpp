@@ -59,7 +59,7 @@ void CListenSocket::OnAccept(int nErrorCode)
 		soTemp.Close ();
 		return ;
 	}
-
+	//TODO: 对 m_sopClient   这个链接,需要做检查,当长时间不发消息,或者是 发的错误包,要强行关掉,如telnet过来之后,其他正常的就无法链接过来了.
 	if (!Accept(*m_sopClient,&add,&iLen))
 	{
 		TRACE("Accetp error.\n");
@@ -71,11 +71,3 @@ void CListenSocket::OnAccept(int nErrorCode)
 	CSocket::OnAccept(nErrorCode);
 }
 
-void CListenSocket::CloseClient()
-{
-	if (m_sopClient->m_bConnect)
-	{
-		m_sopClient->Close ();
-		m_sopClient->m_bConnect = FALSE;
-	}
-}

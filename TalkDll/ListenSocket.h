@@ -27,7 +27,6 @@ public:
 
 // Overrides
 public:
-	void CloseClient();
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CListenSocket)
 	public:

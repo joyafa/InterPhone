@@ -271,7 +271,6 @@ bool CUsbDevice::ConnectDevice()
 			//获取设备路径
 			if(!SetupDiGetInterfaceDeviceDetail(hDevInfo,&devInfoData,devDetail,requireLength,NULL,NULL))
 			{
-				MessageBoxA(NULL,"获取HID设备细节信息失败!","Greetings",0);
 
 				free(devDetail);
 

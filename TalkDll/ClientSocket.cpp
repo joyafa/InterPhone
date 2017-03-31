@@ -46,8 +46,10 @@ END_MESSAGE_MAP()
 
 void CClientSocket::OnClose(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
 	m_bConnect = FALSE;
+
+	Close ();
+	
 	//服务端关掉客户端连接
 	m_pInterface->BeClose ();
 	
@@ -72,6 +74,9 @@ void CClientSocket::OnReceive(int nErrorCode)
 
 	if (strcmp(frame->cFlag ,"NETTALK") != 0)
 	{
+		//TODO: add 包标志不对,直接close连接
+		//Send(m_pBuffer, sizeof(struct TalkFrame));
+		OnClose(0);
 		return;
 	}
 
@@ -124,7 +129,8 @@ void CClientSocket::OnReceive(int nErrorCode)
 			frame->iCom = TC_DISAGREE_TALK;
 			frame->iLen = 0;
 			Send (m_pBuffer,sizeof(struct TalkFrame));
-			Close ();
+			//主动断开,非法包
+			OnClose(0);			
 		}
 		break;
 	default:
@@ -133,3 +139,9 @@ void CClientSocket::OnReceive(int nErrorCode)
 
 	CSocket::OnReceive(nErrorCode);
 }
+
+//TODO: 存在的问题,当telnet连过来后,也被当成连接了, 导致其他有效连接无法连接过来
+//测试过程中遇到客户端怎么都连接不过来了
+//测试网络断开 恢复 后 连接不上
+
+//检查无效连接,将其删除 close

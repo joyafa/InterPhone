@@ -12,6 +12,7 @@
 #include "UdpSocket.h"
 #include "RecSocket.h"
 #include <afxmt.h>
+#include "Log.hpp"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -19,6 +20,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+LOG_INIT;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -71,7 +73,7 @@ CString CInterface::GetHostIpName()
 	char chName[128] = {0};
 	if (SOCKET_ERROR  == gethostname(chName, sizeof(chName)))
 	{
-		TRACE("I can't get the name.\n");
+		LOG_ERR << "Get host name failed!";
 		return "";
 	}
 	struct hostent *phost;
@@ -79,6 +81,7 @@ CString CInterface::GetHostIpName()
 	if (phost == NULL)
 	{
 		TRACE("gethostbyname error .\n");
+		LOG_ERR << "gethostbyname error!";
 		return "";
 	}
 
@@ -95,77 +98,78 @@ CString CInterface::GetHostIpName()
 
 BOOL CInterface::Start(const char *ip)
 {
+	BOOL bRet  = FALSE;
 	try
 	{
 		char name[128];
 		int iLen = 128;
 		int i = 0;
 		CString loip;
-		
-		BOOL bRet;
-		bRet = FALSE;
-		
-		if (m_bWork)
+
+
+		do
 		{
-			TRACE("The talk has worked.\n");
-			goto Exit;
-		}
-		m_sIp = ip;
-		
-		if (SOCKET_ERROR  == gethostname(name,iLen))
-		{
-			TRACE("I can't get the name.\n");
-			goto Exit;
-		}
-		struct hostent *phost;
-		phost = gethostbyname (name);
-		if (phost == NULL)
-		{
-			TRACE("gethostbyname error .\n");
-			goto Exit;
-		}
-		
-		i = 0;
-		while (phost->h_addr_list[i])
-		{
-			loip = inet_ntoa (*(struct in_addr *)phost->h_addr_list[i++]);
-			if (loip == ip)
-				goto Exit;
-		}
-	
-		if(0==m_sopSend)m_sopSend = new CSendClient(m_pIn,this);
-		
-		if (0==m_sopSend)
-		{
-			goto Exit;
-		}
-		if (!m_sopSend->Create ())
-		{
-			goto Exit;
-		}
-		//客户端TCP方式连接服务器
-		m_sopSend->Connect (ip,TALK_COM_PORT);
-		if (GetLastError() != WSAEWOULDBLOCK)
-		{
-			goto Exit1;
-		}
-		m_pUdp->SetIp (ip);
-		
-		bRet = TRUE;
-		m_bWork = TRUE;
-		goto Exit;
-Exit1:
-		if(0!=m_sopSend)
-		{
-			m_sopSend->Close ();
-		}
-Exit:
-		return bRet;
+			if (m_bWork)
+			{
+				TRACE("The talk has worked.\n");
+				break;
+			}
+			m_sIp = ip;
+
+			if (SOCKET_ERROR  == gethostname(name,iLen))
+			{
+				TRACE("I can't get the name.\n");
+				break;
+			}
+			struct hostent *phost;
+			phost = gethostbyname (name);
+			if (phost == NULL)
+			{
+				TRACE("gethostbyname error .\n");
+				break;
+			}
+
+			i = 0;
+			while (phost->h_addr_list[i])
+			{
+				loip = inet_ntoa (*(struct in_addr *)phost->h_addr_list[i++]);
+				if (loip == ip)
+					break;
+			}
+
+			if(NULL == m_sopSend)
+			{
+				m_sopSend = new CSendClient(m_pIn,this);
+				bRet      = m_sopSend->Create ();
+				if (!bRet)
+				{
+					break;;
+				}
+			}
+			else
+			{
+				break;
+			}
+
+			//客户端TCP方式连接服务器
+			m_sopSend->Connect (ip,TALK_COM_PORT);
+			if (GetLastError() != WSAEWOULDBLOCK)
+			{
+				m_sopSend->Close ();
+				break;
+			}
+			m_pUdp->SetIp (ip);
+
+			m_bWork = TRUE;
+			break;
+		}while(false);
 	}
 	catch(...)
 	{
+		TRACE("Start failed!!!");
 	}
-	return FALSE;
+
+	return bRet;
 }
 
 
@@ -174,17 +178,17 @@ BOOL CInterface::End()
 	try
 	{
 		//TODO: 这里可能对所有的都要结束, 不需要判断正在通话中
-		/*if (!m_bWork)
-		{
-			//服务端主动关掉client,拒绝接听时候操作
-			if (m_sopListen)
-			{
-				m_sopListen->CloseClient();
-			}
+		//if (!m_bWork)
+		//{
+		//	//服务端主动关掉client,拒绝接听时候操作
+		//	if (m_sopListen)
+		//	{
+		//		m_sopListen->CloseClient();
+		//	}
 
-			TRACE("The talk hasn't worked.\n");
-			return FALSE;
-		}*/
+		//	TRACE("The talk hasn't worked.\n");
+		//	return FALSE;
+		//}
 
 		if (m_pIn)
 		{
@@ -197,8 +201,6 @@ BOOL CInterface::End()
 			m_sopSend->m_bConnect = FALSE;
 		}
 
-		m_sopListen->CloseClient ();
-
 		m_bWork = FALSE;
 		
 		if(m_sopSend)
@@ -207,10 +209,7 @@ BOOL CInterface::End()
 			m_sopSend = NULL;
 		}
 		
-		if(m_CallBackFun!=0)
-		{
-			m_CallBackFun(MSG_CallClose,"Talk be close.");
-		}
+		
 
 		return TRUE;
 	}
@@ -224,7 +223,6 @@ BOOL CInterface::End()
 
 BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 {
-	int nPort = TALK_COM_PORT;
 	try
 	{
 		m_CallBackFun=__CallBackFun;
@@ -234,13 +232,19 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 			return FALSE;
 		}
 		//创建tcp连接
-		if (!m_sopListen->Create (nPort))
+		if (!m_sopListen->Create (TALK_COM_PORT))
 		{
 			TRACE("Error:%d \n", WSAGetLastError());
 			goto Exit;
 		}
+		//设置Socket的选项, 解决10048错误必须的步骤,关闭scoket后端口便能正常释放
+		BOOL bOptVal = TRUE;
+		int bOptLen = sizeof(BOOL);
+		m_sopListen->SetSockOpt(SO_REUSEADDR, (void *)&bOptVal, bOptLen, SOL_SOCKET);
+
 		//监听
 		m_sopListen->Listen ();
+		
 		//UDP 广播形式
 		if (!m_pRec->Ini ())
 		{
@@ -265,6 +269,7 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 		};
 		
 		m_bIni = TRUE;
+
 		goto Exit;
 Exit4:
 		g_pOut->StopPlay ();
@@ -312,7 +317,6 @@ void CInterface::TalkStart(CString ip)
 
 void CInterface::TalkBeClose()
 {
-	AfxMessageBox("Talk be close.");
 	if(m_CallBackFun!=0)
 	{
 		m_CallBackFun(MSG_CallClose,"关闭");
@@ -327,20 +331,18 @@ void CInterface::BeClose()
 		if (m_bWork)
 		{
 			m_pIn->EnableSend (FALSE);
-			if(0!=m_sopSend)m_sopSend->Close ();
-			if(0!=m_sopSend)m_sopSend->m_bConnect = FALSE;
+			if(NULL != m_sopSend)
+			{
+				m_sopSend->Close ();
+				m_sopSend->m_bConnect = FALSE;
+				m_sopSend = NULL;
+			}
 
-			//生命周期结束,关闭socket
-			m_sopListen->CloseClient ();
 			m_bWork = FALSE;
 			
 			TalkBeClose();
 		}
 		g_soLock.Unlock ();
-		if(m_CallBackFun!=0)
-		{
-			m_CallBackFun(MSG_CallClose,"关闭");
-		}
 	}
 	catch(...)
 	{

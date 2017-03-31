@@ -68,7 +68,6 @@ protected:
 	CString GetMoudleConfigFilePath();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg LRESULT OnMCINotify(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnStopMusic(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
