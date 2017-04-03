@@ -19,6 +19,9 @@
     <Filter Include="MCIMusic">
       <UniqueIdentifier>{2ef4fb5d-7f84-4f97-ba58-2e0430c780fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="button">
+      <UniqueIdentifier>{2948bf32-cfbf-4bd3-bb33-44c0e0223eaa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="configdeal.cpp">
@@ -38,6 +41,21 @@
     </ClCompile>
     <ClCompile Include="MCIPlayMusic\MCIPlayMusic.cpp">
       <Filter>MCIMusic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ServiceTalk\button\BCMenu.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ServiceTalk\button\BtnST.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ServiceTalk\button\CeXDib.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ServiceTalk\button\ShadeButtonST.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ServiceTalk\button\WinXPButtonST.cpp">
+      <Filter>button</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +88,21 @@
     </ClInclude>
     <ClInclude Include="MCIPlayMusic\MCIPlayMusic.h">
       <Filter>MCIMusic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServiceTalk\button\BCMenu.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServiceTalk\button\BtnST.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServiceTalk\button\CeXDib.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServiceTalk\button\ShadeButtonST.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ServiceTalk\button\WinXPButtonST.h">
+      <Filter>button</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

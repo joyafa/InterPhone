@@ -27,3 +27,5 @@
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STDAFX_H__1E94090D_44B8_4553_BA8B_328596D6E97B__INCLUDED_)
+
+#include ".\button\BtnST.h"

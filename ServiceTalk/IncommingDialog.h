@@ -1,4 +1,5 @@
 #pragma once
+#include "E:\Git\InterPhone\ServiceTalk\button\BtnST.h"
 
 
 // CIncommingDialog ¶Ô»°¿ò
@@ -28,4 +29,7 @@ private:
 public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	CButtonST m_btnAccept;
+	CButtonST m_btnReject;
+	virtual BOOL OnInitDialog();
 };

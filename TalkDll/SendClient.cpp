@@ -16,7 +16,8 @@ static char THIS_FILE[] = __FILE__;
 
 CSendClient::CSendClient(CMyWaveIn *pIn,CInterface *pInterface):
 	m_pIn(NULL),
-	m_pInterFace(NULL)
+	m_pInterFace(NULL),
+	m_bConnect(FALSE)
 {
 	m_pBuffer = new char[1024];
 	m_pIn = pIn;

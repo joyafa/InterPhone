@@ -25,6 +25,8 @@ CIncommingDialog::~CIncommingDialog()
 void CIncommingDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDACCEPT, m_btnAccept);
+	DDX_Control(pDX, IDREJECT, m_btnReject);
 }
 
 
@@ -41,19 +43,24 @@ END_MESSAGE_MAP()
 void CIncommingDialog::OnBnClickedAccept()
 {
 	GetDlgItem(IDACCEPT)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDREJECT)->ShowWindow(SW_NORMAL);
+
 	CRect rect;
-	GetClientRect(&rect);
+	GetWindowRect(&rect);
+	ScreenToClient(rect);
 
 	CRect rectRejcetButton;
-	GetDlgItem(IDREJECT)->GetClientRect(&rectRejcetButton);
+	GetDlgItem(IDREJECT)->GetWindowRect(&rectRejcetButton);
+	ScreenToClient(rectRejcetButton);
 	int x = (rect.Width() - rectRejcetButton.Width() )  / 2;
-	GetDlgItem(IDREJECT)->GetWindowRect(&rect);
-	//ClientToScreen(&rectRejcetButton);
-	//TODO:top值不对
-	//GetDlgItem(IDREJECT)->MoveWindow(x, rect.top, rect.Width(), rect.Height());
+	GetDlgItem(IDREJECT)->MoveWindow(x, rectRejcetButton.top, rectRejcetButton.Width(), rectRejcetButton.Height());
+	
 	Invalidate();
+
 	SetTimer(TIME_EVENT, 1000, NULL);
+
 	m_dwCounts = GetTickCount();
+	
 	if (NULL != m_pServiceDlg)
 	{
 		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[0]);
@@ -63,15 +70,13 @@ void CIncommingDialog::OnBnClickedAccept()
 
 void CIncommingDialog::OnBnClickedReject()
 {
-	GetDlgItem(IDACCEPT)->ShowWindow(SW_NORMAL);
-	//GetDlgItem(IDREJECT)->MoveWindow(x, rectRejcetButton.top, rectRejcetButton.Width(), rectRejcetButton.Height());
-
 	if (NULL != m_pServiceDlg)
 	{
 		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[1]);
-		m_pServiceDlg->m_talk.End();
-		ShowWindow(SW_HIDE);
+		m_pServiceDlg->m_talk.End();		
 	}
+
+	ShowWindow(SW_HIDE);
 }
 
 
@@ -101,4 +106,35 @@ void CIncommingDialog::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+BOOL CIncommingDialog::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	short	shBtnColor = 30;
+	//accept
+	CImage imageAccept;
+	imageAccept.Load(".\\res\\accept.png");
+	HBITMAP hBitmap = imageAccept.Detach();
+	m_btnAccept.SetBitmaps(hBitmap, RGB(255, 100, 100));
+	m_btnAccept.SetTooltipText(_T("接听来电"));
+	m_btnAccept.SetFlat();
+	m_btnAccept.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+	/*m_btnClose.SetIcon(IDI_NO3, (int)BTNST_AUTO_GRAY);
+	m_btnClose.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+	m_btnClose.SetTooltipText(_T("Close the application"));*/
+
+	//reject & hangup
+	CImage imageReject;
+	imageReject.Load(".\\res\\reject.png");
+	hBitmap = imageReject.Detach();
+	m_btnReject.SetBitmaps(hBitmap, RGB(255, 100, 100));
+	m_btnReject.SetTooltipText(_T("挂断电话"));
+	m_btnReject.SetFlat();
+	m_btnReject.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+	
+	return TRUE;  // return TRUE unless you set the focus to a control
+				  // 异常: OCX 属性页应返回 FALSE
 }

@@ -77,7 +77,11 @@ EXSTYLE WS_EX_APPWINDOW
 CAPTION "呼叫:服务端"
 FONT 10, "微软雅黑", 400, 0, 0x86
 BEGIN
-    CONTROL         "",IDC_LIST_CLIENT,"SysListView32",LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,-2,0,133,249
+    CONTROL         "",IDC_LIST_CLIENT,"SysListView32",LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,-2,0,133,237
+    LTEXT           "IP:",IDC_STATIC,3,238,8,8
+    LTEXT           "Ver:",IDC_STATIC,69,238,13,8
+    LTEXT           "192.168.101.222",IDC_STATIC_IPADDRESS,12,238,54,8
+    LTEXT           "",IDC_STATIC_VERSION,84,238,42,8
 END
 
 IDD_DIALOG_PW DIALOG 0, 0, 76, 44
@@ -94,8 +98,8 @@ IDD_DIALOG_INCOMING DIALOGEX 0, 0, 120, 85
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_SYSMENU
 FONT 12, "微软雅黑", 400, 0, 0x86
 BEGIN
-    DEFPUSHBUTTON   "接听",IDACCEPT,10,66,50,14
-    PUSHBUTTON      "挂断",IDREJECT,63,66,50,14
+    PUSHBUTTON      "",IDACCEPT,30,66,17,14
+    PUSHBUTTON      "",IDREJECT,73,66,17,14
     LTEXT           "IP       地址:",IDC_STATIC,11,6,38,8
     LTEXT           "计算机名称:",IDC_STATIC,11,24,38,8
     LTEXT           "",IDC_STATIC_IPADDRESS,55,5,60,8
@@ -111,8 +115,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,0,123
+ PRODUCTVERSION 1,0,0,123
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -125,15 +129,16 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080404B0"
+        BLOCK "080404b0"
         BEGIN
-            VALUE "FileDescription", "Talk Microsoft 基础类应用程序"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "Talk"
-            VALUE "LegalCopyright", "版权所有 (C) 2005"
-            VALUE "OriginalFilename", "Talk.EXE"
-            VALUE "ProductName", "Talk 应用程序"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "CompanyName", "深圳诺科电子有限公司"
+            VALUE "FileDescription", "网吧通话系统服务端"
+            VALUE "FileVersion", "1.0.0.123"
+            VALUE "InternalName", "Answer"
+            VALUE "LegalCopyright", "版权所有 Copyright ? 2012-2015 深圳诺科电子有限公司"
+            VALUE "OriginalFilename", "ServiceTalk.EXE"
+            VALUE "ProductName", "ServiceTalk应用程序"
+            VALUE "ProductVersion", "1.0.0.123"
         END
     END
     BLOCK "VarFileInfo"
@@ -195,6 +200,22 @@ END
 IDB_FNDLST_SEL          BITMAP                  "res\\FndLstSel.bmp"
 IDB_FNDLST_SEL2         BITMAP                  "res\\FndLstSel2.bmp"
 IDB_FNDLST_UNSEL        BITMAP                  "res\\list_unselected.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_INCOMING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_TALK_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

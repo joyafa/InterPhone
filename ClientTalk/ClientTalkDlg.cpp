@@ -1,4 +1,4 @@
-// TalkCallDlg.cpp : implementation file
+// ClientTalkDlg.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "configdeal.h"
 #include <mmsystem.h>
 #include <afxpriv.h>
-
+#include <atlimage.h>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -16,14 +16,14 @@ static char THIS_FILE[] = __FILE__;
 extern CClientTalkApp theApp;
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallDlg dialog
+// CClientTalkDlg dialog
 
 CClientTalkDlg::CClientTalkDlg(CWnd* pParent /*=NULL*/)
-: CDialog(CClientTalkDlg::IDD, pParent)
+: CDialogEx(CClientTalkDlg::IDD, pParent)
 , m_callStatus(INITIAL)
 , m_pUsbDevice(NULL)
 {
-	//{{AFX_DATA_INIT(CTalkCallDlg)
+	//{{AFX_DATA_INIT(CClientTalkDlg)
 	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
@@ -33,14 +33,16 @@ CClientTalkDlg::CClientTalkDlg(CWnd* pParent /*=NULL*/)
 
 void CClientTalkDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CTalkCallDlg)
+	CDialogEx::DoDataExchange(pDX);
+	//{{AFX_DATA_MAP(CClientTalkDlg)
 	// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_BTN_CALL, m_btnDial);
+	DDX_Control(pDX, IDC_BTN_HANGUP, m_btnHangup);
 }
 #define WM_STOPMUSIC WM_USER + 2
-BEGIN_MESSAGE_MAP(CClientTalkDlg, CDialog)
-//{{AFX_MSG_MAP(CTalkCallDlg)
+BEGIN_MESSAGE_MAP(CClientTalkDlg, CDialogEx)
+//{{AFX_MSG_MAP(CClientTalkDlg)
 ON_WM_SYSCOMMAND()
 ON_WM_PAINT()
 ON_WM_QUERYDRAGICON()
@@ -52,14 +54,15 @@ ON_MESSAGE(MM_MCINOTIFY, &CClientTalkDlg::OnMCINotify)
 ON_MESSAGE(WM_STOPMUSIC, &CClientTalkDlg::OnStopMusic)
 
 ON_BN_CLICKED(IDC_BTN_CALL, &CClientTalkDlg::OnBnClickedBtnCall)
+ON_BN_CLICKED(IDC_BTN_HANGUP, &CClientTalkDlg::OnBnClickedBtnHangup)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallDlg message handlers
+// CClientTalkDlg message handlers
 
 BOOL CClientTalkDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CDialogEx::OnInitDialog();
 	
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -93,8 +96,9 @@ BOOL CClientTalkDlg::OnInitDialog()
 		
 	}
 	//*/
-	::SetWindowPos(m_hWnd,  HWND_TOPMOST ,
-		0, 0, 50,50, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	/*::SetWindowPos(m_hWnd,  HWND_TOPMOST ,
+		0, 0, 50,50, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);*/
+	CenterWindow();
 
 	GetConfigInfo();
 
@@ -113,6 +117,29 @@ BOOL CClientTalkDlg::OnInitDialog()
 	int CallBack(int type, char *p);
 	m_talk.Ini(CallBack);
 
+	//image button
+	short	shBtnColor = 30;
+	//accept
+	CImage imageDial;
+	imageDial.Load(".\\res\\dial.png");
+	HBITMAP hBitmap = imageDial.Detach();
+	m_btnDial.SetBitmaps(hBitmap, RGB(255, 100, 100));
+	m_btnDial.SetTooltipText(_T("接听来电"));
+	m_btnDial.SetFlat();
+	m_btnDial.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+
+	//reject & hangup
+	CImage imageHangup;
+	imageHangup.Load(".\\res\\hangup.png");
+	hBitmap = imageHangup.Detach();
+	m_btnHangup.SetBitmaps(hBitmap, RGB(255, 100, 100));
+	m_btnHangup.SetTooltipText(_T("挂断电话"));
+	m_btnHangup.SetFlat();
+	m_btnHangup.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+	
+	m_btnDial.ShowWindow(SW_NORMAL);
+	m_btnHangup.ShowWindow(SW_HIDE);
+	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -123,7 +150,7 @@ void CClientTalkDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialog::OnSysCommand(nID, lParam);
+		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -178,19 +205,7 @@ LRESULT CClientTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 		//挂断
 	case RIGHT_KEY:
 		//主叫方通话中
-		if (ONLINE == m_callStatus )
-		{
-			//挂断 hangup
-			m_callStatus = INITIAL;
-			EndCall();
-		}
-		else if ( DIALING == m_callStatus )//拨号响铃...
-		{
-			SetEvent(m_hDialEvents[1]);
-			EndCall();
-			m_callStatus = INITIAL;
-		}
-		
+		OnBnClickedBtnHangup();		
 		break;
 	default:
 		TRACE("%s,EVENT: %d 无效按键,暂不处理!!!\n", __FUNCTION__, event);
@@ -273,7 +288,7 @@ void CClientTalkDlg::OnPaint()
 	}
 	else
 	{
-		CDialog::OnPaint();
+		CDialogEx::OnPaint();
 	}
 }
 
@@ -286,19 +301,30 @@ HCURSOR CClientTalkDlg::OnQueryDragIcon()
 
 void CClientTalkDlg::EndCall() 
 {
+	/*if ( ONLINE != m_callStatus &&
+		 DIALING != m_callStatus )
+	{
+		return;
+	}*/
+
 	try
 	{
-		if(m_bCall)
+		/*if(m_bCall)
 		{
 			m_talk.End();
-		}
+		}*/
+		m_talk.End();
 		m_bCall=false;
-		SetWindowText("结束通话");
 	}
 	catch(...)
 	{
-		SetWindowText("结束通话");
 	}
+
+	SetWindowText("结束通话");
+	m_callStatus = INITIAL;
+
+	m_btnDial.ShowWindow(SW_NORMAL);
+	m_btnHangup.ShowWindow(SW_HIDE);
 }
 
 
@@ -343,7 +369,7 @@ int CallBack(int type, char *p)
 
 LRESULT CClientTalkDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
-	return CDialog::DefWindowProc(message, wParam, lParam);
+	return CDialogEx::DefWindowProc(message, wParam, lParam);
 }
 
 BOOL CClientTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
@@ -354,7 +380,7 @@ BOOL CClientTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	case IDOK :	return FALSE; break ;
 	case IDCANCEL :	return FALSE; break ;
 	}		
-	return CDialog::OnCommand(wParam, lParam);
+	return CDialogEx::OnCommand(wParam, lParam);
 }
 
 
@@ -441,13 +467,17 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 {
 	try
 	{
+		//挂断电话
 		EndCall();
-		SetWindowText("呼叫中...");
 		////////////
 		if(m_talk.Start(m_strServiceIP.GetString())==1)
 		{
+			SetWindowText("呼叫中...");
 			//主叫状态
 			m_callStatus = DIALING;
+			m_btnDial.ShowWindow(SW_HIDE);
+			m_btnHangup.ShowWindow(SW_NORMAL);
+
 			//状态1: 呼叫,可以自行挂断;
 			//状态2: 呼叫超时不接听,本地听到忙音
 
@@ -464,17 +494,33 @@ void CClientTalkDlg::OnBnClickedBtnCall()
 			else
 			{
 				m_bCall=false;
-				SetWindowText("拒绝接听!");
+				SetWindowText("拒绝接听!");				
 			}
 		}
 		else
 		{
-			SetWindowText("连接主机失败!");
+			SetWindowText("网络忙呼叫失败!");
 		}
 	}
 	catch(...)
 	{
-
-		SetWindowText("连接主机发现异常");
+		SetWindowText("网络异常呼叫失败");
 	}
+
+	/*if (!m_bCall)
+	{
+		m_btnDial.ShowWindow(SW_NORMAL);
+		m_btnHangup.ShowWindow(SW_HIDE);
+	}*/
+}
+
+
+void CClientTalkDlg::OnBnClickedBtnHangup()
+{
+	if (DIALING == m_callStatus)
+	{
+		SetEvent(m_hDialEvents[1]);
+	}
+
+	EndCall();
 }

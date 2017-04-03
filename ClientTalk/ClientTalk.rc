@@ -48,7 +48,7 @@ BEGIN
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
     "#endif //_WIN32\r\n"
-    "#include ""res\\TalkCall.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""res\\ClientTalk.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
     "#endif\r\n"
     "\0"
@@ -71,13 +71,14 @@ IDR_MAINFRAME           ICON                    "res\\ClientTalk.ico"
 // Dialog
 //
 
-IDD_TALKCALL_DIALOG DIALOGEX 0, 0, 93, 65
+IDD_CLIENTTALK_DIALOG DIALOGEX 0, 0, 103, 87
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "呼叫机"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "呼叫",IDC_BTN_CALL,32,22,30,15,0,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "",IDC_BTN_CALL,36,33,30,23,0,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "",IDC_BTN_HANGUP,36,31,30,23,0,WS_EX_CLIENTEDGE
 END
 
 
@@ -87,8 +88,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,0,123
+ PRODUCTVERSION 1,0,0,123
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -103,10 +104,14 @@ BEGIN
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "LegalCopyright", "版权所有 (C) "
+            VALUE "CompanyName", "深圳诺科电子有限公司"
+            VALUE "FileDescription", "网吧通话系统客户端"
+            VALUE "FileVersion", "1.0.0.123"
+            VALUE "InternalName", "ClientTalk"
+            VALUE "LegalCopyright", "版权所有 Copyright ? 2012-2015 深圳诺科电子有限公司"
+            VALUE "OriginalFilename", "ClientTalk.DLL"
             VALUE "ProductName", "语音对讲机应用程序"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "1.0.0.123"
         END
     END
     BLOCK "VarFileInfo"
@@ -124,15 +129,24 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_TALKCALL_DIALOG, DIALOG
+    IDD_CLIENTTALK_DIALOG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 86
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 58
+        RIGHTMARGIN, 93
+        BOTTOMMARGIN, 65
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CLIENTTALK_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -142,7 +156,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ABOUTBOX            "关于 TalkCall(&A)..."
+    IDS_ABOUTBOX            "关于 ClientTalk(&A)..."
     IDP_SOCKETS_INIT_FAILED "Windows 通信端口初始化失败。"
 END
 

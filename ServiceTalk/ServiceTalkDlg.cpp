@@ -7,6 +7,7 @@
 #include "PWDLG.h"
 #include <mmsystem.h>
 #include <afxpriv.h>
+#include "publicFunction.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -17,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 // CTalkDlg dialog
 
 CServiceTalkDlg::CServiceTalkDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CServiceTalkDlg::IDD, pParent)
+	: CDialogEx(CServiceTalkDlg::IDD, pParent)
 , m_callStatus(INITIAL)
 , m_pUsbDevice(NULL)
 , m_pIncommingDlg(NULL)
@@ -44,7 +45,7 @@ CServiceTalkDlg::~CServiceTalkDlg()
 
 void CServiceTalkDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CDialogEx::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTalkDlg)
 	// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
@@ -54,7 +55,7 @@ void CServiceTalkDlg::DoDataExchange(CDataExchange* pDX)
 #define WM_STOPMUSIC WM_USER + 2
 
 
-BEGIN_MESSAGE_MAP(CServiceTalkDlg, CDialog)
+BEGIN_MESSAGE_MAP(CServiceTalkDlg, CDialogEx)
 	//{{AFX_MSG_MAP(CTalkDlg)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
@@ -74,7 +75,7 @@ END_MESSAGE_MAP()
 
 BOOL CServiceTalkDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CDialogEx::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
 
@@ -108,7 +109,7 @@ BOOL CServiceTalkDlg::OnInitDialog()
 
 	m_pIncommingDlg = new CIncommingDialog(this);
 	m_pIncommingDlg->Create(IDD_DIALOG_INCOMING, this);
-	m_pIncommingDlg->ShowWindow(SW_HIDE);
+	m_pIncommingDlg->ShowWindow(SW_NORMAL);// SW_HIDE);
 
 	//VID:0x258A, PID:0x001B
 	m_pUsbDevice = new CUsbDevice(m_dwVID, m_dwPID);
@@ -120,6 +121,17 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	int ServiceCallBack(int type, char *p);
 	m_talk.Ini(ServiceCallBack);
+	CString strIpAddress = m_talk.GetLocalIpAddress();
+	SetDlgItemText(IDC_STATIC_IPADDRESS, strIpAddress);
+	
+	CString sFileName;
+	CString sVersion;
+	CString sName;
+	CString sUpgradeInfo;
+	AfxGetModuleFileName(NULL, sFileName);
+	GetVersionInfo(sFileName, sVersion, sName, sUpgradeInfo);
+	SetDlgItemText(IDC_STATIC_VERSION, sVersion);
+
 	SetTimer(990,100,NULL);
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -132,7 +144,7 @@ void CServiceTalkDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialog::OnSysCommand(nID, lParam);
+		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -454,7 +466,7 @@ void CServiceTalkDlg::OnPaint()
 	}
 	else
 	{
-		CDialog::OnPaint();
+		CDialogEx::OnPaint();
 	}
 }
 
@@ -476,7 +488,7 @@ BOOL CServiceTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	
 
 	}		
-	return CDialog::OnCommand(wParam, lParam);
+	return CDialogEx::OnCommand(wParam, lParam);
 }
 
 void CServiceTalkDlg::OnMenuitem32772() 
@@ -504,20 +516,22 @@ void CServiceTalkDlg::OnMenuitem32772()
 		return;
 	}
 //	UnregisterHotKey(m_hWnd,1);
-	CDialog::OnClose();
-	CDialog::DestroyWindow();	
+	CDialogEx::OnClose();
+	CDialogEx::DestroyWindow();	
 }
 
 void CServiceTalkDlg::OnClose() 
 {
 	
 	// TODO: Add your message handler code here and/or call default
-	OnMenuitem32772() ;	
+	//OnMenuitem32772() ;	
+	CDialogEx::OnClose();
+	CDialogEx::DestroyWindow();
 }
 
 void CServiceTalkDlg::OnShowWindow(BOOL bShow, UINT nStatus) 
 {
-	CDialog::OnShowWindow(bShow, nStatus);
+	CDialogEx::OnShowWindow(bShow, nStatus);
 	
 	// TODO: Add your message handler code here
 //	this->ShowWindow(SW_HIDE);
@@ -528,12 +542,12 @@ void CServiceTalkDlg::OnTimer(UINT nIDEvent)
 	// TODO: Add your message handler code here and/or call default
 	//this->ShowWindow(SW_HIDE);
 	KillTimer(990);
-	CDialog::OnTimer(nIDEvent);
+	CDialogEx::OnTimer(nIDEvent);
 }
 
 BOOL CServiceTalkDlg::DestroyWindow() 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	
-	return CDialog::DestroyWindow();
+	return CDialogEx::DestroyWindow();
 }

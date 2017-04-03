@@ -78,6 +78,8 @@ public:
 	CInterface();
 	virtual ~CInterface();
 	CString GetHostIpName();
+	//获取本地ip地址
+	CString GetLocalIpAddress();
 protected:
 	void BeClose();
 	void ConnectResult(int nErrorCode);

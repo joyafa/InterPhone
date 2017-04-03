@@ -103,6 +103,9 @@
     <ClInclude Include="WaveOut.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Log.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="TalkDll.def">

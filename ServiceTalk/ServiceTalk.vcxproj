@@ -91,7 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)$(TargetName)D$(TargetExt)</OutputFile>
-      <AdditionalDependencies>../lib/TalkDllD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../lib/TalkDllD.lib;Version.Lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName)D.pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
@@ -135,7 +135,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\ServiceTalk.exe</OutputFile>
-      <AdditionalDependencies>../lib/talkdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../lib/TalkDll.lib;Version.Lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)$(TargetName)$(TargetExt) ..\InterPhone
@@ -145,8 +145,14 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
   <ItemGroup>
     <ClCompile Include="..\ClientTalk\hardware\UsbDevice.cpp" />
     <ClCompile Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.cpp" />
+    <ClCompile Include="button\BCMenu.cpp" />
+    <ClCompile Include="button\BtnST.cpp" />
+    <ClCompile Include="button\CeXDib.cpp" />
+    <ClCompile Include="button\ShadeButtonST.cpp" />
+    <ClCompile Include="button\WinXPButtonST.cpp" />
     <ClCompile Include="FriendList.cpp" />
     <ClCompile Include="IncommingDialog.cpp" />
+    <ClCompile Include="publicFunction.cpp" />
     <ClCompile Include="PWDLG.cpp" />
     <ClCompile Include="ServiceInterface.cpp" />
     <ClCompile Include="ServiceTalk.cpp" />
@@ -168,8 +174,14 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="..\ClientTalk\hardware\hidusage.h" />
     <ClInclude Include="..\ClientTalk\hardware\UsbDevice.h" />
     <ClInclude Include="..\ClientTalk\MCIPlayMusic\MCIPlayMusic.h" />
+    <ClInclude Include="button\BCMenu.h" />
+    <ClInclude Include="button\BtnST.h" />
+    <ClInclude Include="button\CeXDib.h" />
+    <ClInclude Include="button\ShadeButtonST.h" />
+    <ClInclude Include="button\WinXPButtonST.h" />
     <ClInclude Include="FriendList.h" />
     <ClInclude Include="IncommingDialog.h" />
+    <ClInclude Include="publicFunction.h" />
     <ClInclude Include="PWDLG.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ServiceInterface.h" />
@@ -191,8 +203,10 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <Library Include="..\ClientTalk\hardware\hidparse.lib" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\dial.png" />
     <None Include="res\FndLstSel.bmp" />
     <None Include="res\FndLstSel2.bmp" />
+    <None Include="res\icon1.ico" />
     <None Include="res\list_unselected.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

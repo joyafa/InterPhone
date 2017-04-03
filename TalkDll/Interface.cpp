@@ -96,6 +96,32 @@ CString CInterface::GetHostIpName()
 	return CString(loip) + ";" + chName;
 }
 
+CString CInterface::GetLocalIpAddress()
+{
+	char hostName[128] = {0};
+	if (SOCKET_ERROR == gethostname(hostName, sizeof(hostName)))
+	{
+		return "";
+	}
+
+	struct hostent *phost;
+	phost = gethostbyname(hostName);
+	if (NULL == phost)
+	{
+		return "";
+	}
+
+	int i = 0;
+	CString strIpAddress;
+	while (phost->h_addr_list[i])
+	{
+		strIpAddress = inet_ntoa(*(struct in_addr *)phost->h_addr_list[i++]);
+		break;
+	}
+
+	return strIpAddress;
+}
+
 BOOL CInterface::Start(const char *ip)
 {
 	BOOL bRet  = FALSE;
@@ -105,7 +131,6 @@ BOOL CInterface::Start(const char *ip)
 		int iLen = 128;
 		int i = 0;
 		CString loip;
-
 
 		do
 		{
@@ -152,7 +177,11 @@ BOOL CInterface::Start(const char *ip)
 			}
 
 			//客户端TCP方式连接服务器
-			m_sopSend->Connect (ip,TALK_COM_PORT);
+			bool nRet = m_sopSend->Connect (ip,TALK_COM_PORT);
+			if (!nRet)
+			{
+				DWORD dwErr = GetLastError();
+			}
 			if (GetLastError() != WSAEWOULDBLOCK)
 			{
 				m_sopSend->Close ();
@@ -237,6 +266,9 @@ BOOL CInterface::Ini(_CallBackFun __CallBackFun)
 			TRACE("Error:%d \n", WSAGetLastError());
 			goto Exit;
 		}
+		int timeout = 1000;
+		setsockopt(m_sopListen->m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+
 		//设置Socket的选项, 解决10048错误必须的步骤,关闭scoket后端口便能正常释放
 		BOOL bOptVal = TRUE;
 		int bOptLen = sizeof(BOOL);
@@ -389,8 +421,18 @@ void CInterface::ConnectResult(int nErrorCode)
 
 void CInterface::TalkOnConnect(BOOL bRet)
 {
+	//TODO: bRet false时候 连接失败,挂断处理
+
 	if(m_CallBackFun!=0)
 	{
-		m_CallBackFun(MSG_CallOut, "正在呼叫前台...");
+		if (bRet)
+		{
+			m_CallBackFun(MSG_CallOut, "正在呼叫前台...");
+		}
+		else 
+		{
+
+			m_CallBackFun(MSG_CallClose, "呼叫中断");
+		}
 	}
 }

@@ -19,6 +19,7 @@
     <SccLocalPath />
     <Keyword>MFCProj</Keyword>
     <ProjectName>ClientTalk</ProjectName>
+    <ProjectGuid>{8F38E6BF-FDF5-F088-F040-38EDB7491298}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
@@ -72,18 +73,18 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>_AFXDLL;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Debug\TalkCall.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Debug\ClientTalk.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>..\TalkDll\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\TalkDll\;..\ServiceTalk;</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Debug\TalkCall.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Debug\ClientTalk.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
     </Midl>
@@ -93,7 +94,7 @@
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug\TalkCall.bsc</OutputFile>
+      <OutputFile>.\Debug\ClientTalk.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -119,16 +120,17 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\TalkCall.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Release\ClientTalk.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories>..\TalkDll\;..\ServiceTalk;</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Release\TalkCall.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Release\ClientTalk.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
     </Midl>
@@ -138,7 +140,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release\TalkCall.bsc</OutputFile>
+      <OutputFile>.\Release\ClientTalk.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -150,7 +152,17 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
       <Command>copy /Y $(OutDir)$(TargetName)$(TargetExt) ..\InterPhone</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\TalkDll\;..\ServiceTalk;</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ServiceTalk\button\BCMenu.cpp" />
+    <ClCompile Include="..\ServiceTalk\button\BtnST.cpp" />
+    <ClCompile Include="..\ServiceTalk\button\CeXDib.cpp" />
+    <ClCompile Include="..\ServiceTalk\button\ShadeButtonST.cpp" />
+    <ClCompile Include="..\ServiceTalk\button\WinXPButtonST.cpp" />
     <ClCompile Include="configdeal.cpp" />
     <ClCompile Include="hardware\UsbDevice.cpp" />
     <ClCompile Include="MCIPlayMusic\MCIPlayMusic.cpp" />
@@ -167,6 +179,11 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ResourceCompile Include="ClientTalk.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ServiceTalk\button\BCMenu.h" />
+    <ClInclude Include="..\ServiceTalk\button\BtnST.h" />
+    <ClInclude Include="..\ServiceTalk\button\CeXDib.h" />
+    <ClInclude Include="..\ServiceTalk\button\ShadeButtonST.h" />
+    <ClInclude Include="..\ServiceTalk\button\WinXPButtonST.h" />
     <ClInclude Include="configdeal.h" />
     <ClInclude Include="hardware\hidpi.h" />
     <ClInclude Include="hardware\hidsdi.h" />

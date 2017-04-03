@@ -63,8 +63,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,0,123
+ PRODUCTVERSION 1,0,0,123
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -79,12 +79,14 @@ BEGIN
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "FileDescription", "TalkDll DLL"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "CompanyName", "深圳诺科电子有限公司"
+            VALUE "FileDescription", "语音通话模块"
+            VALUE "FileVersion", "1.0.0.123"
             VALUE "InternalName", "TalkDll"
+            VALUE "LegalCopyright", "版权所有 Copyright ? 2012-2015 深圳诺科电子有限公司"
             VALUE "OriginalFilename", "TalkDll.DLL"
             VALUE "ProductName", "TalkDll Dynamic Link Library"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "1.0.0.123"
         END
     END
     BLOCK "VarFileInfo"

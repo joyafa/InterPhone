@@ -1,4 +1,4 @@
-// TalkCall.cpp : Defines the class behaviors for the application.
+// ClientTalk.cpp : Defines the class behaviors for the application.
 //
 
 #include "stdafx.h"
@@ -12,10 +12,10 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallApp
+// CClientTalkApp
 
 BEGIN_MESSAGE_MAP(CClientTalkApp, CWinApp)
-	//{{AFX_MSG_MAP(CTalkCallApp)
+	//{{AFX_MSG_MAP(CClientTalkApp)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 		//    DO NOT EDIT what you see in these blocks of generated code!
 	//}}AFX_MSG
@@ -23,7 +23,7 @@ BEGIN_MESSAGE_MAP(CClientTalkApp, CWinApp)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallApp construction
+// CClientTalkApp construction
 
 CClientTalkApp::CClientTalkApp()
 {
@@ -32,12 +32,12 @@ CClientTalkApp::CClientTalkApp()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// The one and only CTalkCallApp object
+// The one and only CClientTalkApp object
 
 CClientTalkApp theApp;
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallApp initialization
+// CClientTalkApp initialization
 
 BOOL CClientTalkApp::InitInstance()
 {

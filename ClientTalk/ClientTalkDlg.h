@@ -1,15 +1,19 @@
-// TalkCallDlg.h : header file
+// ClientTalkDlg.h : header file
 //
 
-#if !defined(AFX_TALKCALLDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_)
-#define AFX_TALKCALLDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_
+#if !defined(AFX_ClientTalkDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_)
+#define AFX_ClientTalkDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
+#include <afxwin.h>
 #include "..\TalkDll\Interface.h"
 #include ".\hardware\UsbDevice.h"
 #include ".\MCIPlayMusic\MCIPlayMusic.h"
+#include <afxdialogex.h>
+#include "button\BtnST.h"
+#include "E:\Git\InterPhone\ServiceTalk\button\BtnST.h"
 
 enum CallStatus
 {
@@ -21,9 +25,9 @@ enum CallStatus
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallDlg dialog
+// CClientTalkDlg dialog
 
-class CClientTalkDlg : public CDialog
+class CClientTalkDlg : public CDialogEx
 {
 // Construction
 public:
@@ -42,13 +46,13 @@ public:
 	//结束现有的通话
 	void EndCall() ;
 // Dialog Data
-	//{{AFX_DATA(CTalkCallDlg)
-	enum { IDD = IDD_TALKCALL_DIALOG };
+	//{{AFX_DATA(CClientTalkDlg)
+	enum { IDD = IDD_CLIENTTALK_DIALOG };
 		// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CTalkCallDlg)
+	//{{AFX_VIRTUAL(CClientTalkDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -60,7 +64,7 @@ protected:
 	HICON m_hIcon;
 
 	// Generated message map functions
-	//{{AFX_MSG(CTalkCallDlg)
+	//{{AFX_MSG(CClientTalkDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg LRESULT OnHandlePhone( WPARAM wParam, LPARAM lParam );
@@ -92,6 +96,10 @@ private:
 
 	CMCIPlayMusic m_mciMusic;
 
+	CButtonST m_btnDial;
+	CButtonST m_btnHangup;
+
+
 public:
 	afx_msg void OnBnClickedBtnCall();
 
@@ -103,9 +111,10 @@ public:
 	//              2 前台服务端,被叫方,只能做接听电话操作,考虑前台呼叫客户端的情况--> 因为有界面,采取界面按钮方式,而非事件方式
 	//记录当前状态: 主叫 还是 接听
 	CallStatus m_callStatus;
+	afx_msg void OnBnClickedBtnHangup();
 };
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_TALKCALLDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_)
+#endif // !defined(AFX_ClientTalkDLG_H__3BB882D4_255E_4002_A514_25896E860019__INCLUDED_)

@@ -19,6 +19,9 @@
     <Filter Include="MCIMusic">
       <UniqueIdentifier>{5b25dfe3-e74b-4d6f-969e-ac7f7c7ffc6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="button">
+      <UniqueIdentifier>{bde6bbb9-d7b7-4165-92b8-1c8e27cacf99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PWDLG.cpp">
@@ -49,6 +52,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IncommingDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="button\BCMenu.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="button\BtnST.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="button\CeXDib.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="button\ShadeButtonST.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="button\WinXPButtonST.cpp">
+      <Filter>button</Filter>
+    </ClCompile>
+    <ClCompile Include="publicFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,6 +116,24 @@
     <ClInclude Include="IncommingDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="button\BCMenu.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="button\BtnST.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="button\CeXDib.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="button\ShadeButtonST.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="button\WinXPButtonST.h">
+      <Filter>button</Filter>
+    </ClInclude>
+    <ClInclude Include="publicFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ReadMe.txt" />
@@ -129,6 +168,10 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\list_unselected.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\dial.png" />
+    <None Include="res\icon1.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

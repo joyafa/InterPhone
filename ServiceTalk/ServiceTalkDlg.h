@@ -15,6 +15,7 @@
 #include "friendlist.h"
 #include "ServiceInterface.h"
 #include "IncommingDialog.h"
+#include <afxdialogex.h>
 enum CallStatus
 {
 	INITIAL    = 0, //³õÊ¼×´Ì¬     
@@ -32,7 +33,7 @@ struct _tagCallFrom
 };
 
 
-class CServiceTalkDlg : public CDialog
+class CServiceTalkDlg : public CDialogEx
 {
 	// Construction
 public:

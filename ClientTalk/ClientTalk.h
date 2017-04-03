@@ -1,8 +1,8 @@
-// TalkCall.h : main header file for the TALKCALL application
+// ClientTalk.h : main header file for the ClientTalk application
 //
 
-#if !defined(AFX_TALKCALL_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_)
-#define AFX_TALKCALL_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_
+#if !defined(AFX_ClientTalk_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_)
+#define AFX_ClientTalk_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -15,8 +15,8 @@
 #include "resource.h"		// main symbols
 
 /////////////////////////////////////////////////////////////////////////////
-// CTalkCallApp:
-// See TalkCall.cpp for the implementation of this class
+// CClientTalkApp:
+// See ClientTalk.cpp for the implementation of this class
 //
 
 class CClientTalkApp : public CWinApp
@@ -26,7 +26,7 @@ public:
 
 // Overrides
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CTalkCallApp)
+	//{{AFX_VIRTUAL(CClientTalkApp)
 	public:
 	virtual BOOL InitInstance();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -34,7 +34,7 @@ public:
 
 // Implementation
 
-	//{{AFX_MSG(CTalkCallApp)
+	//{{AFX_MSG(CClientTalkApp)
 		// NOTE - the ClassWizard will add and remove member functions here.
 		//    DO NOT EDIT what you see in these blocks of generated code !
 	//}}AFX_MSG
@@ -47,4 +47,4 @@ public:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_TALKCALL_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_)
+#endif // !defined(AFX_ClientTalk_H__66B6F248_F7CE_4B2B_94BD_A46C85907633__INCLUDED_)

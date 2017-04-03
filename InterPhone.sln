@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServiceTalk", "ServiceTalk\ServiceTalk.vcxproj", "{101A7BF7-3B68-4002-1571-05CBD928C426}"
 	ProjectSection(ProjectDependencies) = postProject
 		{13AB87B9-F895-7E64-DC2F-F590837CBFB1} = {13AB87B9-F895-7E64-DC2F-F590837CBFB1}
@@ -12,11 +14,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientTalk", "ClientTalk\Cl
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TalkDll", "TalkDll\TalkDll.vcxproj", "{13AB87B9-F895-7E64-DC2F-F590837CBFB1}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{13AB87B9-F895-7E64-DC2F-F590837CBFB1} = {13AB87B9-F895-7E64-DC2F-F590837CBFB1}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,12 +40,6 @@ Global
 		{13AB87B9-F895-7E64-DC2F-F590837CBFB1}.Release|Win32.Build.0 = Release|Win32
 		{13AB87B9-F895-7E64-DC2F-F590837CBFB1}.Template|Win32.ActiveCfg = Template|Win32
 		{13AB87B9-F895-7E64-DC2F-F590837CBFB1}.Template|Win32.Build.0 = Template|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Debug|Win32.Build.0 = Debug|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Release|Win32.ActiveCfg = Release|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Release|Win32.Build.0 = Release|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Template|Win32.ActiveCfg = Template|Win32
-		{6C0FC01B-6A74-9AE1-363E-6A7BAB2DC61D}.Template|Win32.Build.0 = Template|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
