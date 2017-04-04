@@ -15,7 +15,7 @@ struct TalkFrame
 	char cFlag[16];
 	unsigned __int32 iCom;
 	unsigned __int32 iLen;
-	char chClientInfo[128];//ip ºÍ name
+	char chClientInfo[512];//ip ºÍ name
 };
 #pragma pack(pop)
 

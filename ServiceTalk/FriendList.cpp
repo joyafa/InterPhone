@@ -4,13 +4,16 @@
 #include "stdafx.h"
 #include "FriendList.h"
 #include "resource.h"
-
+#include "conio.h"
 // CFriendList
 IMPLEMENT_DYNAMIC(CFriendList, CListCtrl)
 
 CFriendList::CFriendList()
 {
 	m_nLastSel = -2;
+	m_pToolTip = new CToolTipCtrlX; 
+	m_nItem = -1;
+	m_nSubItem = -1;
 }
 
 CFriendList::~CFriendList()
@@ -18,6 +21,7 @@ CFriendList::~CFriendList()
 	m_bmpSel1.DeleteObject();
 	m_bmpSel2.DeleteObject();
 	m_bmpUnSel.DeleteObject();
+	delete m_pToolTip;
 }
 
 BEGIN_MESSAGE_MAP(CFriendList, CListCtrl)
@@ -26,6 +30,7 @@ BEGIN_MESSAGE_MAP(CFriendList, CListCtrl)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_KEYDOWN()
 	ON_WM_RBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 void CFriendList::PreSubclassWindow()
@@ -154,6 +159,45 @@ void CFriendList::PreSubclassWindow()
 	hPenWrite.DeleteObject();
 }
 
+void CFriendList::Init()
+{
+	if (m_pToolTip->m_hWnd == NULL)
+	{
+		EnableToolTips(TRUE);
+		// Create ToolTip control
+		m_pToolTip->Create(this);
+		m_pToolTip->SetMaxTipWidth(500);//若屏蔽这行提示信息的格式可能会出现问题，不能换行  
+		m_pToolTip->ModifyStyle(0, TTS_NOPREFIX);
+		m_pToolTip->SetDelayTime(TTDT_AUTOPOP, 2000);//弹出提示停留时间
+		m_pToolTip->SetDelayTime(TTDT_INITIAL, 500); //鼠标停留 500ms 弹出提示
+		// Create inactive
+		m_pToolTip->Activate(FALSE);
+		// Enable multiline
+		m_pToolTip->SendMessage(TTM_SETMAXTIPWIDTH, 0, 400);
+	} // if
+}
+
+
+void CFriendList::SetTooltipText(LPCTSTR lpszText, BOOL bActivate)
+{
+	// We cannot accept NULL pointer
+	if (lpszText == NULL) return;
+
+	// Initialize ToolTip
+	Init();
+
+	// If there is no tooltip defined then add it
+	if (m_pToolTip->GetToolCount() == 0)
+	{
+		CRect rectBtn;
+		GetClientRect(rectBtn);
+		m_pToolTip->AddTool(this, lpszText, rectBtn, 1);
+	} // if
+
+	  // Set text for tooltip
+	m_pToolTip->UpdateTipText(lpszText, this, 1);
+	m_pToolTip->Activate(bActivate);
+} // End of SetTooltipText
 
 
 void CFriendList::OnLButtonDblClk(UINT nFlags, CPoint point)
@@ -181,16 +225,27 @@ void CFriendList::OnLButtonDblClk(UINT nFlags, CPoint point)
 }
 
 void CFriendList::AddNewUser( CString str )
-{
-	//int nCount = GetItemCount();
-	//str.Insert(0, "机器名:");
-	LVCOLUMN column;
-	GetColumn(0, &column);
-	column.pszText = (LPSTR)str.GetString();
+{	
+	
 
-	SetColumn(0, &column);
-	InsertItem(0,str,0);
+	int nPos = str.Find("\n");
+	nPos = str.Find("\n", nPos + 1);
+	CString strUser = str.GetBuffer(nPos);
+	InsertItem(0, strUser.GetString(), 0);
+	m_listData[strUser.GetString()] = str.GetString();
+
 	m_nLastSel = -2;
+}
+
+void CFriendList::ShowData()
+{
+	//先取出相同名字的,然后更新
+	for (int i = 0; i < GetItemCount(); ++i)
+	{
+		DWORD dwData = GetItemData(i);
+		OutputDebugStringA((char *)dwData);
+		_cprintf("%s\n", (char *)dwData);
+	}
 }
 
 void CFriendList::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
@@ -423,4 +478,44 @@ CString CFriendList::GetStringLeft( CString &str, int nLeft )
         nLeft--;   
 	}   
 	return   sRet;   
+}
+
+
+BOOL CFriendList::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	Init();
+	m_pToolTip->RelayEvent(pMsg);
+
+	return CListCtrl::PreTranslateMessage(pMsg);
+}
+
+
+void CFriendList::OnMouseMove(UINT nFlags, CPoint point)
+{
+	CString str;
+	LVHITTESTINFO lvhti;
+	// 判断鼠标当前所在的位置(行, 列)
+	lvhti.pt = point;
+	SubItemHitTest(&lvhti);
+
+	// 如果鼠标移动到另一个单元格内, 则进行处理; 否则, 不做处理
+	if ((lvhti.iItem != m_nItem) || (lvhti.iSubItem != m_nSubItem))
+	{
+		// 保存当前鼠标所在的(行,列)
+		m_nItem = lvhti.iItem;
+		m_nSubItem = lvhti.iSubItem;
+
+		// 如果鼠标移动到一个合法的单元格内,则显示新的提示信息
+		// 否则, 不显示提示
+		if ((m_nItem != -1) && (m_nSubItem != -1))
+		{
+			// @@@@@@@@ 在这里修改要显示的提示信息
+			// 这里仅仅是一个例子---获得当前单元格的文字信息, 并设置为新的提示信息
+			str = GetItemText(m_nItem, m_nSubItem);
+		}
+		SetTooltipText(m_listData[str.GetString()].c_str(), TRUE);
+	}
+
+	CListCtrl::OnMouseMove(nFlags, point);
 }

@@ -22,6 +22,9 @@
     <Filter Include="button">
       <UniqueIdentifier>{bde6bbb9-d7b7-4165-92b8-1c8e27cacf99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="stream">
+      <UniqueIdentifier>{8315a943-a05f-420a-873f-8c3d082edad3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PWDLG.cpp">
@@ -70,6 +73,18 @@
       <Filter>button</Filter>
     </ClCompile>
     <ClCompile Include="publicFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stream\stream.cc">
+      <Filter>stream</Filter>
+    </ClCompile>
+    <ClCompile Include="stream\common.cc">
+      <Filter>stream</Filter>
+    </ClCompile>
+    <ClCompile Include="FileVersionInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolTipCtrlX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,6 +147,27 @@
       <Filter>button</Filter>
     </ClInclude>
     <ClInclude Include="publicFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stream\sigslot.h">
+      <Filter>stream</Filter>
+    </ClInclude>
+    <ClInclude Include="stream\stream.h">
+      <Filter>stream</Filter>
+    </ClInclude>
+    <ClInclude Include="stream\basictypes.h">
+      <Filter>stream</Filter>
+    </ClInclude>
+    <ClInclude Include="stream\common.h">
+      <Filter>stream</Filter>
+    </ClInclude>
+    <ClInclude Include="stream\scoped_ptr.h">
+      <Filter>stream</Filter>
+    </ClInclude>
+    <ClInclude Include="FileVersionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolTipCtrlX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

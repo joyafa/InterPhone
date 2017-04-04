@@ -1,3 +1,4 @@
+#include <string>
 // Interface.h: interface for the CInterface class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -62,6 +63,7 @@ class CSendClient;
 class CUdpSocket;
 class CRecSocket;
 
+using namespace std;
 typedef	 int ( *_CallBackFun)(int iflag,char *buf);
 class AFX_EXT_CLASS CInterface
 {
@@ -79,7 +81,7 @@ public:
 	virtual ~CInterface();
 	CString GetHostIpName();
 	//获取本地ip地址
-	CString GetLocalIpAddress();
+	string GetLocalIpAddress();
 protected:
 	void BeClose();
 	void ConnectResult(int nErrorCode);

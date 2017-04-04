@@ -150,6 +150,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClCompile Include="button\CeXDib.cpp" />
     <ClCompile Include="button\ShadeButtonST.cpp" />
     <ClCompile Include="button\WinXPButtonST.cpp" />
+    <ClCompile Include="FileVersionInfo.cpp" />
     <ClCompile Include="FriendList.cpp" />
     <ClCompile Include="IncommingDialog.cpp" />
     <ClCompile Include="publicFunction.cpp" />
@@ -163,7 +164,10 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="stream\common.cc" />
+    <ClCompile Include="stream\stream.cc" />
     <ClCompile Include="SYSTEMTRAY.CPP" />
+    <ClCompile Include="ToolTipCtrlX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ServiceTalk.rc" />
@@ -179,6 +183,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="button\CeXDib.h" />
     <ClInclude Include="button\ShadeButtonST.h" />
     <ClInclude Include="button\WinXPButtonST.h" />
+    <ClInclude Include="FileVersionInfo.h" />
     <ClInclude Include="FriendList.h" />
     <ClInclude Include="IncommingDialog.h" />
     <ClInclude Include="publicFunction.h" />
@@ -187,8 +192,14 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="ServiceInterface.h" />
     <ClInclude Include="ServiceTalkDlg.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="stream\basictypes.h" />
+    <ClInclude Include="stream\common.h" />
+    <ClInclude Include="stream\scoped_ptr.h" />
+    <ClInclude Include="stream\sigslot.h" />
+    <ClInclude Include="stream\stream.h" />
     <ClInclude Include="SYSTEMTRAY.H" />
     <ClInclude Include="ServiceTalk.h" />
+    <ClInclude Include="ToolTipCtrlX.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\ServiceTalk.ico" />

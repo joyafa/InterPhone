@@ -16,6 +16,8 @@
 #include "ServiceInterface.h"
 #include "IncommingDialog.h"
 #include <afxdialogex.h>
+#include <vector>
+#include "stream\stream.h"
 enum CallStatus
 {
 	INITIAL    = 0, //初始状态     
@@ -32,6 +34,13 @@ struct _tagCallFrom
 	bool bAcceptCall;
 };
 
+struct CallingInfo
+{
+	char szClientIpAddress[64]; //IP地址
+	char szClientName[512];     //机器名称
+	char szBeginTime;           //通话开始时间 hh:mm:ss'ms
+	int  nLastTime;             //通话持续时长
+};
 
 class CServiceTalkDlg : public CDialogEx
 {
@@ -65,6 +74,7 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CTalkDlg)
 	virtual BOOL OnInitDialog();
+	bool ReadHistoryCallInfo(vector<CallingInfo> &vecIinfo);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 
 	afx_msg LRESULT OnHandlePhone( WPARAM wParam, LPARAM lParam );
@@ -112,6 +122,12 @@ public:
 	//记录当前状态: 主叫 还是 接听
 	CallStatus m_callStatus;
 	CString	m_name;
+
+private:
+	//文件操作
+	FileStream m_fs;
+	//记录通话信息,新数据进行更新,最后一次性写入文件中
+	vector<CallingInfo> m_vecInfo;
 };
 
 //{{AFX_INSERT_LOCATION}}

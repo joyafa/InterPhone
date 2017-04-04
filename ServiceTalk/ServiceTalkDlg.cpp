@@ -8,6 +8,10 @@
 #include <mmsystem.h>
 #include <afxpriv.h>
 #include "publicFunction.h"
+#include ".\\stream\\stream.h"
+
+#include "conio.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -28,6 +32,8 @@ CServiceTalkDlg::CServiceTalkDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_fs.Open("callinfo.dat", "ab+");
 }
 
 CServiceTalkDlg::~CServiceTalkDlg()
@@ -60,7 +66,6 @@ BEGIN_MESSAGE_MAP(CServiceTalkDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_COMMAND(ID_MENUITEM32772, OnMenuitem32772)
 	ON_WM_CLOSE()
 	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
@@ -82,6 +87,7 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
+	AllocConsole();
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != NULL)
@@ -121,8 +127,8 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	int ServiceCallBack(int type, char *p);
 	m_talk.Ini(ServiceCallBack);
-	CString strIpAddress = m_talk.GetLocalIpAddress();
-	SetDlgItemText(IDC_STATIC_IPADDRESS, strIpAddress);
+	string strIpAddress = m_talk.GetLocalIpAddress();
+	SetDlgItemText(IDC_STATIC_IPADDRESS, strIpAddress.c_str());
 	
 	CString sFileName;
 	CString sVersion;
@@ -133,8 +139,32 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	SetDlgItemText(IDC_STATIC_VERSION, sVersion);
 
 	SetTimer(990,100,NULL);
-	
+	//读取文件记录
+	ReadHistoryCallInfo(m_vecInfo);
+	for (size_t pos = 0; pos < m_vecInfo.size();++pos)
+	{
+		m_listClient.AddNewUser(m_vecInfo[pos].szClientName);
+	}
+	//m_listClient.AddNewUser("");
+	m_listClient.ShowData();
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+
+//从文件中获取历史通话信息
+bool CServiceTalkDlg::ReadHistoryCallInfo(vector<CallingInfo> &vecIinfo)
+{
+	if (SS_OPEN != m_fs.GetState())
+	{
+		TRACE("文件未打开,无法执行操作!");
+	} 
+	CallingInfo info;
+	while (SR_EOS != m_fs.Read(&info, sizeof(CallingInfo), NULL, NULL))
+	{
+		vecIinfo.push_back(info);
+	}
+
+	return true;
 }
 
 void CServiceTalkDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -233,9 +263,9 @@ int   MessageLoop(
 }   
 
 //192.168.1.1;china;
-bool SplitIpAndName(const string &strIpName, string &ip, string &name)
+bool SplitIpAndName(const string &strIpName, string &ip, string &name, char chSeparator = '\n')
 {
-	size_t pos = strIpName.find_first_of(';');
+	size_t pos = strIpName.find_first_of(chSeparator);
 	if (pos != std::string::npos)
 	{
 		ip    = strIpName.substr(0, pos);
@@ -299,14 +329,20 @@ int ServiceCallBack(int type, char *p)
 	}
 	switch(type)
 	{
-	case MSG_ADDCLIENTUSER :
+	case MSG_ADDCLIENTUSER:
 		//名字;IP
-		pMainDlg->m_listClient.AddNewUser(p);
+		{
+			SYSTEMTIME st;
+			GetLocalTime(&st);
+			CString strUser;
+			strUser.Format("%s\n通话开始时间:%04d-%02d-%02d %02d:%02d:%02d'%03d", p, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+			pMainDlg->m_listClient.AddNewUser(strUser);
+	    }
 		break;
 	case MSG_CallIn:
 		//来电,同步等待完成
 		return pMainDlg->AcceptCallFrom(p);
-	case MSG_CallOk  :
+	case MSG_CallOk:
 		{
 			CString str="对讲中--";
 			str=str+pMainDlg->m_name;
@@ -485,46 +521,29 @@ BOOL CServiceTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDOK :	
 		case IDCANCEL :	return FALSE; break ;
-	
-
 	}		
 	return CDialogEx::OnCommand(wParam, lParam);
 }
 
-void CServiceTalkDlg::OnMenuitem32772() 
-{
-	// TODO: Add your command handler code here
-	/*
-	if (::MessageBoxEx(this->m_hWnd, "确认退出?", "语音对讲机", 
-		MB_OKCANCEL | MB_ICONINFORMATION, 0) == IDCANCEL)
-	{
-		return;
-	}
-	*/
-	try
-	{
-		PWDLG dlg;
-		if(dlg.DoModal()== IDCANCEL)
-		{
-			return;
-		}
-		m_talk.End();
-		Sleep(1000);
-	}
-	catch(...)
-	{
-		return;
-	}
-//	UnregisterHotKey(m_hWnd,1);
-	CDialogEx::OnClose();
-	CDialogEx::DestroyWindow();	
-}
 
 void CServiceTalkDlg::OnClose() 
 {
-	
-	// TODO: Add your message handler code here and/or call default
-	//OnMenuitem32772() ;	
+	m_fs.SetPosition(0);
+	//TEST data
+	CallingInfo info;
+	for (size_t pos = 0; pos < 10;++pos)
+	{
+		strcpy(info.szClientIpAddress, "192.168.10.72");
+		sprintf(info.szClientName, "IP:%s\n机器名:China%c\n通话开始时间:%s", "192.168.1.1", '0' + pos, "2017-1-24 11:12:21'666");
+		m_vecInfo.push_back(info);
+	}
+
+	for (size_t pos = 0; pos < m_vecInfo.size(); ++pos)
+	{
+		m_fs.Write(&m_vecInfo[pos], sizeof(CallingInfo));
+	}
+	m_fs.Close();
+
 	CDialogEx::OnClose();
 	CDialogEx::DestroyWindow();
 }

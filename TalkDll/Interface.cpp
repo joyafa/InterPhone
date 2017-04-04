@@ -93,10 +93,10 @@ CString CInterface::GetHostIpName()
 		break;
 	}
 
-	return CString(loip) + ";" + chName;
+	return CString("IP:") + loip + "\n" + "»úÆ÷Ãû:" + chName;
 }
 
-CString CInterface::GetLocalIpAddress()
+string CInterface::GetLocalIpAddress()
 {
 	char hostName[128] = {0};
 	if (SOCKET_ERROR == gethostname(hostName, sizeof(hostName)))

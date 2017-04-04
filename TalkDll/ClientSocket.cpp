@@ -58,6 +58,7 @@ void CClientSocket::OnClose(int nErrorCode)
 
 void CClientSocket::OnReceive(int nErrorCode) 
 {
+	KillTimer(NULL, 111);
 	// TODO: Add your specialized code here and/or call the base class
 	struct TalkFrame *frame;
 	frame = (struct TalkFrame *)m_pBuffer;
