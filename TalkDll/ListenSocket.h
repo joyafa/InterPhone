@@ -39,6 +39,13 @@ public:
 	//}}AFX_MSG
 
 // Implementation
+	void CloseClient()
+	{
+		if (m_sopClient && m_sopClient->m_bConnect)
+		{
+			m_sopClient->OnClose(0);
+		}
+	}
 protected:
 	CClientSocket *m_sopClient;
 	CInterface *m_pInterface;

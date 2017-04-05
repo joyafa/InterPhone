@@ -358,6 +358,8 @@ int CallBack(int type, char *p)
 			SetEvent(pMainDlg->m_hDialEvents[1]);	
 		    pMainDlg->EndCall();
 		}
+		pMainDlg->m_btnDial.ShowWindow(SW_NORMAL);
+		pMainDlg->m_btnHangup.ShowWindow(SW_HIDE);
 		pMainDlg->m_callStatus = INITIAL;
 		pMainDlg->m_bCall=false;
 		pMainDlg->SetWindowText("Í¨»°¹Ø±Õ");

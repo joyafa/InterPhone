@@ -112,8 +112,9 @@ private:
 
 	CMCIPlayMusic m_mciMusic;
 
-	CIncommingDialog *m_pIncommingDlg;
+	
 public:
+	CIncommingDialog *m_pIncommingDlg;
 	CFriendList m_listClient;
 	//被叫事件: 0:接听事件;1:挂断事件
 	HANDLE m_hAcceptCallEvents[2];

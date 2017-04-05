@@ -22,6 +22,7 @@ protected:
 public:
 	afx_msg void OnBnClickedAccept();
 	afx_msg void OnBnClickedReject();
+	void UpdataWindow();
 	DWORD m_dwCounts;
 
 private:

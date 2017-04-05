@@ -51,7 +51,7 @@ void CIncommingDialog::OnBnClickedAccept()
 
 	CRect rectRejcetButton;
 	GetDlgItem(IDREJECT)->GetWindowRect(&rectRejcetButton);
-	ScreenToClient(rectRejcetButton);
+	ScreenToClient(&rectRejcetButton);
 	int x = (rect.Width() - rectRejcetButton.Width() )  / 2;
 	GetDlgItem(IDREJECT)->MoveWindow(x, rectRejcetButton.top, rectRejcetButton.Width(), rectRejcetButton.Height());
 	
@@ -70,11 +70,39 @@ void CIncommingDialog::OnBnClickedAccept()
 
 void CIncommingDialog::OnBnClickedReject()
 {
+	KillTimer(TIME_EVENT);
 	if (NULL != m_pServiceDlg)
 	{
-		SetEvent(m_pServiceDlg->m_hAcceptCallEvents[1]);
+		if (m_pServiceDlg->m_callStatus == ACCEPTING)
+		{
+			SetEvent(m_pServiceDlg->m_hAcceptCallEvents[1]);
+		}
 		m_pServiceDlg->m_talk.End();		
 	}
+
+	UpdataWindow();
+}
+
+void CIncommingDialog::UpdataWindow()
+{
+	GetDlgItem(IDACCEPT)->ShowWindow(SW_NORMAL);
+	GetDlgItem(IDREJECT)->ShowWindow(SW_NORMAL);
+
+	CRect rect;
+	GetWindowRect(&rect);
+	ScreenToClient(rect);
+
+	CRect rectAcceptButton;
+	GetDlgItem(IDACCEPT)->GetWindowRect(&rectAcceptButton);
+	ScreenToClient(&rectAcceptButton);
+
+	CRect rectRejectButton;
+	GetDlgItem(IDREJECT)->GetWindowRect(&rectRejectButton);
+
+	int x = rectAcceptButton.right + (rect.Width() - rectAcceptButton.left - rectAcceptButton.Width() - rectRejectButton.Width()) / 2;
+	GetDlgItem(IDREJECT)->MoveWindow(x, rectAcceptButton.top, rectRejectButton.Width(), rectRejectButton.Height());
+
+	Invalidate();
 
 	ShowWindow(SW_HIDE);
 }

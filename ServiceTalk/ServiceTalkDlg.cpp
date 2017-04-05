@@ -87,7 +87,6 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
-	AllocConsole();
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != NULL)
@@ -115,7 +114,7 @@ BOOL CServiceTalkDlg::OnInitDialog()
 
 	m_pIncommingDlg = new CIncommingDialog(this);
 	m_pIncommingDlg->Create(IDD_DIALOG_INCOMING, this);
-	m_pIncommingDlg->ShowWindow(SW_NORMAL);// SW_HIDE);
+	m_pIncommingDlg->ShowWindow(SW_HIDE);// SW_HIDE);
 
 	//VID:0x258A, PID:0x001B
 	m_pUsbDevice = new CUsbDevice(m_dwVID, m_dwPID);
@@ -145,8 +144,7 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	{
 		m_listClient.AddNewUser(m_vecInfo[pos].szClientName);
 	}
-	//m_listClient.AddNewUser("");
-	m_listClient.ShowData();
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -344,15 +342,20 @@ int ServiceCallBack(int type, char *p)
 		return pMainDlg->AcceptCallFrom(p);
 	case MSG_CallOk:
 		{
-			CString str="对讲中--";
+			CString str="通话中--";
 			str=str+pMainDlg->m_name;
 			pMainDlg->SetWindowText(str);
 			pMainDlg->KillTimer(900);
 		}
 		break;
 	case MSG_CallClose :
-		//
-		//	SetWindowText("语音呼叫机");
+		//客户端主动挂掉电话消息
+		if (pMainDlg->m_callStatus == ACCEPTING)
+		{
+			SetEvent(pMainDlg->m_hAcceptCallEvents[1]);
+		}
+		pMainDlg->m_pIncommingDlg->UpdataWindow();
+		pMainDlg->SetWindowText("呼叫:服务端");
 		break;
 	}
 
@@ -423,7 +426,7 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			m_talk.End();
 			m_callStatus = INITIAL;
 		}
-		m_pIncommingDlg->ShowWindow(SW_HIDE);
+		m_pIncommingDlg->UpdataWindow();
 		break;
 	}
 
@@ -529,14 +532,6 @@ BOOL CServiceTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 void CServiceTalkDlg::OnClose() 
 {
 	m_fs.SetPosition(0);
-	//TEST data
-	CallingInfo info;
-	for (size_t pos = 0; pos < 10;++pos)
-	{
-		strcpy(info.szClientIpAddress, "192.168.10.72");
-		sprintf(info.szClientName, "IP:%s\n机器名:China%c\n通话开始时间:%s", "192.168.1.1", '0' + pos, "2017-1-24 11:12:21'666");
-		m_vecInfo.push_back(info);
-	}
 
 	for (size_t pos = 0; pos < m_vecInfo.size(); ++pos)
 	{

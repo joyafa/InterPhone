@@ -96,11 +96,12 @@ private:
 
 	CMCIPlayMusic m_mciMusic;
 
-	CButtonST m_btnDial;
-	CButtonST m_btnHangup;
 
 
 public:
+	CButtonST m_btnDial;
+	CButtonST m_btnHangup;
+
 	afx_msg void OnBnClickedBtnCall();
 
 	//主叫事件: 0:接听事件;1:挂断事件
