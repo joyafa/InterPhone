@@ -411,6 +411,7 @@ LRESULT CSystemTray::OnTrayNotification(UINT wParam, LONG lParam)
     // Clicking with right button brings up a context menu
     if (LOWORD(lParam) == WM_RBUTTONUP)
     {    
+		return 1;
         if (!menu.LoadMenu(m_tnd.uID)) return 0;
         if (!(pSubMenu = menu.GetSubMenu(0))) return 0;
 
@@ -432,6 +433,16 @@ LRESULT CSystemTray::OnTrayNotification(UINT wParam, LONG lParam)
     } 
     else if (LOWORD(lParam) == WM_LBUTTONDBLCLK) 
     {
+		BOOL bVisible = pTarget->IsWindowVisible();
+		if (bVisible)
+		{
+			pTarget->ShowWindow(SW_HIDE);
+		}
+		else
+		{
+			pTarget->ShowWindow(SW_NORMAL);
+		}
+		return 1;
         // double click received, the default action is to execute default menu item
         pTarget->SetForegroundWindow();  
 
@@ -444,9 +455,7 @@ LRESULT CSystemTray::OnTrayNotification(UINT wParam, LONG lParam)
         }
         else
             uItem = m_DefaultMenuItemID;
-        
         pTarget->SendMessage(WM_COMMAND, uItem, 0);
-
         menu.DestroyMenu();
     }
 
@@ -457,8 +466,10 @@ LRESULT CSystemTray::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
     if (message == m_tnd.uCallbackMessage)
         return OnTrayNotification(wParam, lParam);
-//	if(message == WM_LBUTTONDBLCLK);
-//		AfxMessageBox("test");
+	if(message == WM_LBUTTONDBLCLK)
+	{
+		GetParent()->ShowWindow(SW_NORMAL);
+	}
 		//m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
 	return CWnd::WindowProc(message, wParam, lParam);
 }

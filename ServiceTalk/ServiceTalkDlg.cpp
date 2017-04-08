@@ -138,14 +138,32 @@ BOOL CServiceTalkDlg::OnInitDialog()
 	SetDlgItemText(IDC_STATIC_VERSION, sVersion);
 
 	SetTimer(990,100,NULL);
+	SetTimer(1111, 1000, NULL);
+	m_listClient.Init();
+	m_listClient.AddNewUser("pc001\n192.168.10.1\n开始:11:45:22'334\n时长:1'10s");
+	m_listClient.AddNewUser("pc002\n192.168.10.2\n开始:12:45:22'334\n时长:2'10s");
+	m_listClient.AddNewUser("pc003\n192.168.10.3\n开始:13:45:22'334\n时长:3'10s");
+	m_listClient.AddNewUser("pc004\n192.168.10.4\n开始:14:45:22'334\n时长:4'10s");
+	m_listClient.AddNewUser("pc005\n192.168.10.5\n开始:15:45:22'334\n时长:5'10s");
 	//读取文件记录
 	ReadHistoryCallInfo(m_vecInfo);
 	for (size_t pos = 0; pos < m_vecInfo.size();++pos)
 	{
 		m_listClient.AddNewUser(m_vecInfo[pos].szClientName);
 	}
+	SetWindowLong(m_hWnd, GWL_STYLE, GetWindowLong(m_hWnd, GWL_STYLE) & ~WS_MAXIMIZEBOX);
+	CRect rect;
+	GetClientRect(&rect);
+	ClientToScreen(&rect);
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	CRect rectDesktop;
+	HWND hDesktopWnd = ::GetDesktopWindow();
+	::GetClientRect(hDesktopWnd, &rectDesktop);
+	ClientToScreen(&rectDesktop);
+	
+	SetWindowPos(&wndTopMost, rectDesktop.right - rect.Width() - 10, 100, rect.Width(), rect.Height(), SWP_SHOWWINDOW);
+	
+		return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 
@@ -290,9 +308,23 @@ bool CServiceTalkDlg::AcceptCallFrom(const char* pIpAndName)
 	{
 		m_pIncommingDlg->SetDlgItemText(IDC_STATIC_IPADDRESS, strIp.c_str());
 		m_pIncommingDlg->SetDlgItemText(IDC_STATIC_COMPUTERNAME, strName.c_str());
+		m_pIncommingDlg->SetDlgItemText(IDC_STATIC_TALKTIME, "00:00:00");
 		m_pIncommingDlg->m_dwCounts = GetTickCount();
 		m_pIncommingDlg->ShowWindow(SW_SHOW);
 		m_pIncommingDlg->CenterWindow();
+		/*CRect rect;
+		GetClientRect(&rect);
+		CRect rectIncommingRect;
+		::GetClientRect(m_pIncommingDlg->m_hWnd, &rectIncommingRect);
+		ClientToScreen(&rect);
+		ClientToScreen(&rectIncommingRect);
+		CString strLog;
+		strLog.Format("rec:%d %d %d %d %d %d %d %d\n", rect.left, rect.right, rect.Width(), rect.Height(), rectIncommingRect.left, rectIncommingRect.right, rectIncommingRect.Width(), rectIncommingRect.Height());
+		OutputDebugString(strLog);
+		::MoveWindow(m_pIncommingDlg->m_hWnd, rect.left - rectIncommingRect.Width(), rect.top + rect.Height() / 2 - 100, rectIncommingRect.Width(), rectIncommingRect.Height(), TRUE);
+		*/
+	//	strLog.Format("rec:%d %d %d %d %d %d %d %d\n", rect.left, rect.right, rect.Width(), rect.Height(), rectIncommingRect.left, rectIncommingRect.right, rectIncommingRect.Width(), rectIncommingRect.Height());
+	//	OutputDebugString(strLog);
 	}
 	//创建播放声音线程
 	//TODO:显示提示来电提醒对话框
@@ -332,9 +364,16 @@ int ServiceCallBack(int type, char *p)
 		{
 			SYSTEMTIME st;
 			GetLocalTime(&st);
-			CString strUser;
-			strUser.Format("%s\n通话开始时间:%04d-%02d-%02d %02d:%02d:%02d'%03d", p, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-			pMainDlg->m_listClient.AddNewUser(strUser);
+			pMainDlg->m_strCallingInfo.Format("%s开始:%04d-%02d-%02d %02d:%02d:%02d'%03d",
+				p, //机器名\nip
+				st.wYear, 
+				st.wMonth, 
+				st.wDay, 
+				st.wHour, 
+				st.wMinute, 
+				st.wSecond, 
+				st.wMilliseconds);
+			pMainDlg->m_listClient.AddNewUser(pMainDlg->m_strCallingInfo);
 	    }
 		break;
 	case MSG_CallIn:
@@ -354,7 +393,27 @@ int ServiceCallBack(int type, char *p)
 		{
 			SetEvent(pMainDlg->m_hAcceptCallEvents[1]);
 		}
-		pMainDlg->m_pIncommingDlg->UpdataWindow();
+		//TODO: 会多显示一次断开时间
+		CString strCallingTime;
+		pMainDlg->m_pIncommingDlg->UpdataWindow(strCallingTime);
+		if (pMainDlg->m_callStatus == ONLINE)
+		{
+			
+			SYSTEMTIME st;
+			GetLocalTime(&st);
+			pMainDlg->m_strCallingInfo.Format("%s\n结束:%04d-%02d-%02d %02d:%02d:%02d'%03d\n时长:%s",
+				pMainDlg->m_strCallingInfo.GetString(),
+				st.wYear,
+				st.wMonth,
+				st.wDay,
+				st.wHour,
+				st.wMinute,
+				st.wSecond,
+				st.wMilliseconds,
+				strCallingTime.GetString());
+			pMainDlg->m_listClient.AddNewUser(pMainDlg->m_strCallingInfo);
+		}
+
 		pMainDlg->SetWindowText("呼叫:服务端");
 		break;
 	}
@@ -417,6 +476,24 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			//挂断 hangup
 			m_talk.End();
 			m_callStatus = INITIAL;
+
+			{
+				CString strCallingTime;
+				m_pIncommingDlg->UpdataWindow(strCallingTime);
+				SYSTEMTIME st;
+				GetLocalTime(&st);
+				m_strCallingInfo.Format("%s\n结束:%04d-%02d-%02d %02d:%02d:%02d'%03d\n时长:%s",
+					m_strCallingInfo.GetString(),
+					st.wYear,
+					st.wMonth,
+					st.wDay,
+					st.wHour,
+					st.wMinute,
+					st.wSecond,
+					st.wMilliseconds,
+					strCallingTime.GetString());
+				m_listClient.AddNewUser(m_strCallingInfo);
+			}
 		}
 		else if (ACCEPTING == m_callStatus)//来电响铃...
 		{
@@ -426,7 +503,7 @@ LRESULT CServiceTalkDlg::OnHandlePhone( WPARAM wParam, LPARAM lParam )
 			m_talk.End();
 			m_callStatus = INITIAL;
 		}
-		m_pIncommingDlg->UpdataWindow();
+		
 		break;
 	}
 
@@ -531,6 +608,8 @@ BOOL CServiceTalkDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CServiceTalkDlg::OnClose() 
 {
+	ShowWindow(SW_HIDE);
+	return;
 	m_fs.SetPosition(0);
 
 	for (size_t pos = 0; pos < m_vecInfo.size(); ++pos)
@@ -556,6 +635,10 @@ void CServiceTalkDlg::OnTimer(UINT nIDEvent)
 	// TODO: Add your message handler code here and/or call default
 	//this->ShowWindow(SW_HIDE);
 	KillTimer(990);
+	if (nIDEvent == 1111)
+	{
+		KillWindowsManager();
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -564,4 +647,67 @@ BOOL CServiceTalkDlg::DestroyWindow()
 	// TODO: Add your specialized code here and/or call the base class
 	
 	return CDialogEx::DestroyWindow();
+}
+
+//还有问题,无法取到进程名字
+void CServiceTalkDlg::KillWindowsManager()
+{
+	HWND hwnd;
+	int iItem = 0;
+	LVITEM lvitem, *plvitem;
+	char ItemBuf[512], *pItem;
+	DWORD PID;
+	HANDLE hProcess;
+	//查找任务管理器ListView窗口句柄
+	hwnd = ::FindWindow("#32770", _T("Windows 任务管理器"));
+	hwnd = ::FindWindowEx(hwnd, 0, "#32770", 0);
+	hwnd = ::FindWindowEx(hwnd, 0, "SysListView32", 0);
+	//Windows任务管理器尚未启动则返回
+	if (!hwnd)return;
+	else
+	{
+		//没有指定目标进程则返回
+		iItem=::SendMessage(hwnd,LVM_GETNEXTITEM,-1,LVNI_SELECTED);
+		if (iItem == -1)return;
+		else
+		{
+			//获取进程句柄操作失败则返回
+			GetWindowThreadProcessId(hwnd,&PID);
+			hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, PID);
+			if (!hProcess)return;
+			else
+			{
+				plvitem = (LVITEM*)VirtualAllocEx(hProcess, NULL, sizeof(LVITEM), MEM_COMMIT, PAGE_READWRITE);
+				pItem = (char*)VirtualAllocEx(hProcess, NULL, 512, MEM_COMMIT, PAGE_READWRITE);
+				//无法分配内存则返回
+				if ((!plvitem) || (!pItem))return;
+				else
+				{
+					lvitem.cchTextMax = 512;
+					lvitem.iSubItem = 3;
+					lvitem.state = LVIS_SELECTED;
+					lvitem.stateMask = LVIS_SELECTED;
+					//ProcessName
+					lvitem.pszText=pItem;
+					BOOL bRet = WriteProcessMemory(hProcess, plvitem, &lvitem, sizeof(LVITEM), NULL);
+					::SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)iItem, (LPARAM)plvitem);
+					bRet = ReadProcessMemory(hProcess, pItem, ItemBuf, 512, NULL);
+					//比较字符串,将Test.exe改成你的进程映像名即可
+					//TODO:名字为空
+					CString str=(CString)ItemBuf;
+					if (str.CompareNoCase(_T("ServiceTalkD.exe")) == 0)
+					{
+						HWND hWnd = ::FindWindow(NULL, _T("Windows 任务管理器"));
+						::SendMessage(hWnd, WM_DESTROY, 0, 0);
+						Sleep(10);
+						::MessageBox(NULL, _T("禁止关闭系统关键进程！"), _T("提示"), MB_ICONERROR | MB_OK);
+					}
+				}
+			}
+		}
+	}//释放内存
+	CloseHandle(hwnd);
+	CloseHandle(hProcess);
+	VirtualFreeEx(hProcess, plvitem, 0, MEM_RELEASE);
+	VirtualFreeEx(hProcess, pItem, 0, MEM_RELEASE);
 }

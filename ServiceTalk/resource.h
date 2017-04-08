@@ -19,7 +19,6 @@
 #define IDC_LIST_CLIENT                 1001
 #define IDC_STATIC_IPADDRESS            1002
 #define IDC_STATIC_COMPUTERNAME         1003
-#define IDC_STATIC_IPADDRESS2           1003
 #define IDC_STATIC_VERSION              1003
 #define IDACCEPT                        1004
 #define IDREJECT                        1005
@@ -30,7 +29,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
+#define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           101

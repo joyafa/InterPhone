@@ -27,7 +27,6 @@ public:
 	// 添加新列表项
 	void AddNewUser(CString str);
 
-	void ShowData();
 	void Init();
 	void SetTooltipText(LPCTSTR lpszText, BOOL bActivate);
 protected:
@@ -43,7 +42,7 @@ protected:
 
 	int m_nItem;
 	int m_nSubItem;
-	map<string, string> m_listData;
+	map<string, string> m_mapCallData;
 public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);

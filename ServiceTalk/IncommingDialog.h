@@ -22,7 +22,7 @@ protected:
 public:
 	afx_msg void OnBnClickedAccept();
 	afx_msg void OnBnClickedReject();
-	void UpdataWindow();
+	void UpdataWindow(CString &strCallingTime);
 	DWORD m_dwCounts;
 
 private:

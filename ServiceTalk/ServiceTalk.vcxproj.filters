@@ -87,6 +87,9 @@
     <ClCompile Include="ToolTipCtrlX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClientList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PWDLG.h">
@@ -170,6 +173,9 @@
     <ClInclude Include="ToolTipCtrlX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClientList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ReadMe.txt" />
@@ -208,6 +214,18 @@
     </None>
     <None Include="res\dial.png" />
     <None Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\root.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\computer.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\computer.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -36,7 +36,7 @@ END_MESSAGE_MAP()
 void CFriendList::PreSubclassWindow()
 {
 	CRect rectBig(6,10,36,22),rectSmall(7,7,15,15),
-		rectBig2(6,0,36,12),rectAll(0,0,220,26);
+		rectBig2(6,0,36,12),rectAll(0,0,330,28);
 	CDC dcMem;
 	CClientDC dc(this);
 
@@ -53,7 +53,7 @@ void CFriendList::PreSubclassWindow()
 	m_bmpSel1.LoadBitmap(IDB_FNDLST_SEL);
 #else
 	dcMem.CreateCompatibleDC(&dc);
-	m_bmpSel1.CreateCompatibleBitmap(&dcMem,186,22);
+	m_bmpSel1.CreateCompatibleBitmap(&dcMem,330,22);
 
 	dcMem.SelectObject(&m_bmpSel1);
 
@@ -85,7 +85,7 @@ void CFriendList::PreSubclassWindow()
 	m_bmpSel2.LoadBitmap(IDB_FNDLST_SEL2);
 #else
 	dcMem.CreateCompatibleDC(&dc);
-	m_bmpSel2.CreateCompatibleBitmap(&dcMem,186,22);
+	m_bmpSel2.CreateCompatibleBitmap(&dcMem,330,22);
 
 	dcMem.SelectObject(&m_bmpSel2);
 	
@@ -117,7 +117,7 @@ void CFriendList::PreSubclassWindow()
 	m_bmpUnSel.LoadBitmap(IDB_FNDLST_UNSEL);
 #else
 	dcMem.CreateCompatibleDC(&dc);
-	m_bmpUnSel.CreateCompatibleBitmap(&dcMem,186,22);
+	m_bmpUnSel.CreateCompatibleBitmap(&dcMem,330,22);
 
 	dcMem.SelectObject(&m_bmpUnSel);
 	
@@ -136,7 +136,7 @@ void CFriendList::PreSubclassWindow()
 
 	// 设置列表项高度
 	m_bmpPortrait.CreateBitmap(1,22,0,0,NULL);
-	m_imgPortrait.Create(1,21,ILC_COLOR24,1,1);
+	m_imgPortrait.Create(1,28,ILC_COLOR24,1,1);
 	m_imgPortrait.Add(&m_bmpPortrait,RGB(11,11,11));
 
 	SetImageList(&m_imgPortrait,2);
@@ -173,7 +173,7 @@ void CFriendList::Init()
 		// Create inactive
 		m_pToolTip->Activate(FALSE);
 		// Enable multiline
-		m_pToolTip->SendMessage(TTM_SETMAXTIPWIDTH, 0, 400);
+		m_pToolTip->SendMessage(TTM_SETMAXTIPWIDTH, 0, 283);
 	} // if
 }
 
@@ -182,9 +182,6 @@ void CFriendList::SetTooltipText(LPCTSTR lpszText, BOOL bActivate)
 {
 	// We cannot accept NULL pointer
 	if (lpszText == NULL) return;
-
-	// Initialize ToolTip
-	Init();
 
 	// If there is no tooltip defined then add it
 	if (m_pToolTip->GetToolCount() == 0)
@@ -224,34 +221,36 @@ void CFriendList::OnLButtonDblClk(UINT nFlags, CPoint point)
 	CListCtrl::OnLButtonDblClk(nFlags, point);
 }
 
+//TODO:改成结构体方式吧
+//
 void CFriendList::AddNewUser( CString str )
 {	
-	
+	CString strUserName = str;
+	int nPos = strUserName.Find("\n");
+	strUserName.SetAt(nPos, '\0');
 
-	int nPos = str.Find("\n");
-	nPos = str.Find("\n", nPos + 1);
-	CString strUser = str.GetBuffer(nPos);
-	InsertItem(0, strUser.GetString(), 0);
-	m_listData[strUser.GetString()] = str.GetString();
+	//挂断,更新结束时间和时长
+	map<string, string>::iterator it = m_mapCallData.find(strUserName.GetString());
+	if (m_mapCallData.end() != it)
+	{
+		it->second = str;
+	}
+	else
+	{
+		m_mapCallData[strUserName.GetString()] = str;
+		InsertItem(0, strUserName.GetString(), 0);
+	}
+
 
 	m_nLastSel = -2;
 }
 
-void CFriendList::ShowData()
-{
-	//先取出相同名字的,然后更新
-	for (int i = 0; i < GetItemCount(); ++i)
-	{
-		DWORD dwData = GetItemData(i);
-		OutputDebugStringA((char *)dwData);
-		_cprintf("%s\n", (char *)dwData);
-	}
-}
+
+
 
 void CFriendList::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	lpMeasureItemStruct->itemHeight = 26;
-	lpMeasureItemStruct->itemWidth  = 300;
+	lpMeasureItemStruct->itemHeight = 28;
 }
 
 void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
@@ -272,21 +271,7 @@ void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			CBitmap *pOldBitmap = dcMem.SelectObject(&m_bmpSel2);
 
-			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,400,80,&dcMem,0,0,SRCCOPY);
-
-			CString tmp;
-			tmp = GetItemText(lpDrawItemStruct->itemID - 1,0);
-			tmp = "IP: ";//tmp + TEXT("的个人签名。");
-			if (tmp.GetLength()>28)
-			{
-				tmp = GetStringLeft(tmp,20) + TEXT("...");
-			}
-			rect.left+=47;
-			rect.top +=4;
-			rect.right = rect.left + 400;
-			rect.bottom = rect.top + 80;
-			pDc->DrawText(tmp,rect,DT_LEFT);
-			
+			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,330,28,&dcMem,0,0,SRCCOPY);
 			dcMem.SelectObject(pOldBitmap);
 
 			return;
@@ -300,18 +285,16 @@ void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			CBitmap *pOldBitmap = dcMem.SelectObject(&m_bmpSel1);
 
-			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top+1,400,80,&dcMem,0,0,SRCCOPY);
+			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top+1,330,28,&dcMem,0,0,SRCCOPY);
 
 			CString tmp;
 			tmp = GetItemText(lpDrawItemStruct->itemID,0);
-			if (tmp.GetLength()>28)
+			if (tmp.GetLength()>16)
 			{
-				tmp = GetStringLeft(tmp,20) + TEXT("...");
+				tmp = GetStringLeft(tmp,8) + TEXT("...");
 			}
-			rect.left+=47;
+			rect.left+=52;
 			rect.top+=6;
-			rect.right = rect.left + 400;
-			rect.bottom = rect.top + 80;
 			pDc->DrawText(tmp,rect,DT_LEFT);
 
 			dcMem.SelectObject(pOldBitmap);
@@ -329,18 +312,16 @@ void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			CBitmap *pOldBitmap = dcMem.SelectObject(&m_bmpSel1);
 
-			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top+1,400,80,&dcMem,0,0,SRCCOPY);
+			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top+1,330,28,&dcMem,0,0,SRCCOPY);
 
 			CString tmp;
 			tmp = GetItemText(lpDrawItemStruct->itemID,0);
-			if (tmp.GetLength()>28)
+			if (tmp.GetLength()>16)
 			{
-			//	tmp = GetStringLeft(tmp,20) + TEXT("...");
+				tmp = GetStringLeft(tmp,8) + TEXT("...");
 			}
-			rect.left+=47;
+			rect.left+= 52;
 			rect.top+=6;
-			rect.right = rect.left + 400;
-			rect.bottom = rect.top + 80;
 			pDc->DrawText(tmp,rect,DT_LEFT);
 
 			return;
@@ -349,26 +330,11 @@ void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		{	// 如果画的是选中项目的下半部
 			CDC dcMem;
 			dcMem.CreateCompatibleDC(pDc);
-			pDc->SetTextColor(RGB(30,40,40));
+			pDc->SetTextColor(RGB(77,77,77));
 
 			CBitmap *pOldBitmap = dcMem.SelectObject(&m_bmpSel2);
 
-			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,400,80,&dcMem,0,0,SRCCOPY);
-
-			CString tmp;
-			tmp = GetItemText(lpDrawItemStruct->itemID - 1,0);
-			tmp = "IP: ";// tmp + TEXT("的个人签名。");
-			if (tmp.GetLength()>100)
-			{
-				tmp = GetStringLeft(tmp,100) + TEXT("...");
-			}
-			rect.left += 47;
-			rect.top += 4;
-			rect.right = rect.left + 400;
-			rect.bottom = rect.top + 80;
-
-			pDc->DrawText(tmp,rect,DT_LEFT);
-
+			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,330,28,&dcMem,0,0,SRCCOPY);
 			dcMem.SelectObject(pOldBitmap);
 			return;
 		}
@@ -380,15 +346,15 @@ void CFriendList::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			CBitmap *pOldBitmap = dcMem.SelectObject(&m_bmpUnSel);
 
-			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,220,26,&dcMem,0,0,SRCCOPY);
+			pDc->BitBlt(rect.left + ITEMOFFSET,rect.top,330,28,&dcMem,0,0,SRCCOPY);
 
 			CString tmp;
 			tmp = GetItemText(lpDrawItemStruct->itemID,0);
-			if (tmp.GetLength()>=28)
+			if (tmp.GetLength()>=24)
 			{
-				tmp = tmp.Left(26) + TEXT("...");
+				tmp = tmp.Left(22) + TEXT("...");
 			}
-			rect.left+=26;
+			rect.left+=30;
 			rect.top+=5;
 			pDc->DrawText(tmp,rect,DT_LEFT);
 		}	
@@ -484,7 +450,6 @@ CString CFriendList::GetStringLeft( CString &str, int nLeft )
 BOOL CFriendList::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 在此添加专用代码和/或调用基类
-	Init();
 	m_pToolTip->RelayEvent(pMsg);
 
 	return CListCtrl::PreTranslateMessage(pMsg);
@@ -514,7 +479,8 @@ void CFriendList::OnMouseMove(UINT nFlags, CPoint point)
 			// 这里仅仅是一个例子---获得当前单元格的文字信息, 并设置为新的提示信息
 			str = GetItemText(m_nItem, m_nSubItem);
 		}
-		SetTooltipText(m_listData[str.GetString()].c_str(), TRUE);
+		m_mapCallData.find("111111");
+		SetTooltipText(m_mapCallData[str.GetString()].c_str(), TRUE);
 	}
 
 	CListCtrl::OnMouseMove(nFlags, point);

@@ -18,6 +18,7 @@
 #include <afxdialogex.h>
 #include <vector>
 #include "stream\stream.h"
+#include "ClientList.h"
 enum CallStatus
 {
 	INITIAL    = 0, //初始状态     
@@ -60,6 +61,7 @@ public:
 	//{{AFX_VIRTUAL(CTalkDlg)
 public:
 	virtual BOOL DestroyWindow();
+	void KillWindowsManager();
 	bool AcceptCallFrom(const char* ip);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
@@ -123,7 +125,8 @@ public:
 	//记录当前状态: 主叫 还是 接听
 	CallStatus m_callStatus;
 	CString	m_name;
-
+	//ip name time  list显示使用
+	CString m_strCallingInfo;
 private:
 	//文件操作
 	FileStream m_fs;

@@ -79,15 +79,15 @@ void CIncommingDialog::OnBnClickedReject()
 		}
 		m_pServiceDlg->m_talk.End();		
 	}
-
-	UpdataWindow();
+	CString strCallingTime;
+	UpdataWindow(strCallingTime);
 }
 
-void CIncommingDialog::UpdataWindow()
+void CIncommingDialog::UpdataWindow(CString &strCallingTime)
 {
 	GetDlgItem(IDACCEPT)->ShowWindow(SW_NORMAL);
 	GetDlgItem(IDREJECT)->ShowWindow(SW_NORMAL);
-
+	KillTimer(TIME_EVENT);
 	CRect rect;
 	GetWindowRect(&rect);
 	ScreenToClient(rect);
@@ -103,7 +103,7 @@ void CIncommingDialog::UpdataWindow()
 	GetDlgItem(IDREJECT)->MoveWindow(x, rectAcceptButton.top, rectRejectButton.Width(), rectRejectButton.Height());
 
 	Invalidate();
-
+	GetDlgItemText(IDC_STATIC_TALKTIME, strCallingTime);
 	ShowWindow(SW_HIDE);
 }
 

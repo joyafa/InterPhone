@@ -92,8 +92,8 @@ CString CInterface::GetHostIpName()
 		loip = inet_ntoa (*(struct in_addr *)phost->h_addr_list[i++]);
 		break;
 	}
-
-	return CString("IP:") + loip + "\n" + "机器名:" + chName;
+	//name\nip 机器名\nIP
+	return CString("机器名:") + chName + "\n" + "IP地址:" + loip + "\n";
 }
 
 string CInterface::GetLocalIpAddress()

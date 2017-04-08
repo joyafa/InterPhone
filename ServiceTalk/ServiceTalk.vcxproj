@@ -150,6 +150,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClCompile Include="button\CeXDib.cpp" />
     <ClCompile Include="button\ShadeButtonST.cpp" />
     <ClCompile Include="button\WinXPButtonST.cpp" />
+    <ClCompile Include="ClientList.cpp" />
     <ClCompile Include="FileVersionInfo.cpp" />
     <ClCompile Include="FriendList.cpp" />
     <ClCompile Include="IncommingDialog.cpp" />
@@ -183,6 +184,7 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <ClInclude Include="button\CeXDib.h" />
     <ClInclude Include="button\ShadeButtonST.h" />
     <ClInclude Include="button\WinXPButtonST.h" />
+    <ClInclude Include="ClientList.h" />
     <ClInclude Include="FileVersionInfo.h" />
     <ClInclude Include="FriendList.h" />
     <ClInclude Include="IncommingDialog.h" />
@@ -214,11 +216,15 @@ copy /Y $(OutDir)$(TargetName)D.pdb ..\InterPhone</Command>
     <Library Include="..\ClientTalk\hardware\hidparse.lib" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\bitmap2.bmp" />
+    <None Include="res\computer.bmp" />
+    <None Include="res\computer.ico" />
     <None Include="res\dial.png" />
     <None Include="res\FndLstSel.bmp" />
     <None Include="res\FndLstSel2.bmp" />
     <None Include="res\icon1.ico" />
     <None Include="res\list_unselected.bmp" />
+    <None Include="res\root.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
